@@ -25,6 +25,22 @@ body {
     text-decoration: none;
 }
 
+.pst {
+    text-align: center;
+    color: #000000;
+}
+
+.hr1 {
+    border: 2px solid white;
+    width: 50%;
+    margin: 50px auto;
+}
+
+.powqp {
+    text-align: center;
+    color: white;
+}
+
 .ts {
     text-align: right;
     color: rgb(43, 0, 255);
