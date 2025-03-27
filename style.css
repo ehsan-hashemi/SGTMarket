@@ -101,3 +101,117 @@ h2 {
     text-align: left;
     clear: both;
 }
+
+footer {
+    background-color: #000000;
+    color: white;
+    text-align: center;
+    padding: 0;
+}
+
+.cpsf {
+    color: #000000;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    direction: rtl;
+    text-align: right;
+}
+
+.pte1 {
+    direction: ltr;
+}
+
+.dpaf {
+    direction: ltr;
+    text-align: center;
+}
+
+.qopa {
+    color: white;
+}
+
+/* کانتینر اصلی فوتر */
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    background-color: #333;
+    color: #fff;
+    padding: 0;
+  }
+  
+  .footer-section {
+    flex: 1 1 30%; /* تنظیم اندازه بخش‌ها */
+    margin: 0;
+  }
+  
+  .footer-section h3 {
+    border-bottom: 2px solid orangered; /* خط زیر عنوان‌ها */
+    padding-bottom: 5px;
+  }
+  
+  .footer-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-section ul li {
+    margin: 5px 0;
+  }
+  
+  .footer-section ul li a {
+    color: orangered; /* رنگ لینک‌ها */
+    text-decoration: none;
+  }
+  
+  .footer-section ul li a:hover {
+    text-decoration: underline;
+  }
+  
+  .dfsgg {
+    direction: rtl;
+    color: white;
+    text-decoration: none;
+  }
+
+  .social-media a img {
+    width: 32px;
+    height: 32px;
+    margin: 0 5px;
+  }
+  
+  .footer-bottom {
+    text-align: center;
+    background-color: #222;
+    padding: 10px;
+  }
+  
+  .footer-bottom p {
+    margin: 0;
+    font-size: 14px;
+  }
+
+footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.social-icons {
+    margin-top: 10px;
+    gap: 15px;
+    direction: ltr;
+}
+
+.social-icons a img {
+    width: 32px;
+    height: 32px;
+    direction: ltr;
+    text-align: left;
+}
