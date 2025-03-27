@@ -1,5 +1,5 @@
 body {
-    font-family: Tahoma, Arial;
+    font-family: Dubai, Arial;
     background-color: orangered;
     margin: 0;
     padding: 0;
@@ -17,6 +17,10 @@ body {
 .s {
     width: 200px;
     height: 200px;
+}
+
+.h2sq {
+    text-align: center;
 }
 
 .spt {
@@ -38,6 +42,7 @@ body {
 
 .h2c {
     color: #000000;
+    font-size: large;
 }
 
 .powqp {
@@ -73,6 +78,11 @@ body {
     display: flex;
     align-items: center; 
     justify-content: center; 
+    color: #000000;
+}
+
+.oaud {
+    text-decoration: none;
 }
 
 .icon {
