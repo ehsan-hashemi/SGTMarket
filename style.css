@@ -215,3 +215,8 @@ footer p {
     direction: ltr;
     text-align: left;
 }
+
+.age1pt {
+    margin-left: 20px;
+    margin-right: 20px;
+}
