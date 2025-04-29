@@ -56,7 +56,13 @@
   a {
     text-decoration: none;
   }
-  
+
+.iconh {
+    width: 200px;
+    height: 200px;
+    border-radius: 7px;
+}
+
   ul {
     margin: 0;
     padding: 0;
