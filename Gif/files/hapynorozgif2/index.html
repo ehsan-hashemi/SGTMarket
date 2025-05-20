@@ -21,14 +21,14 @@
       </script>
       <script>
         // بارگذاری هدر
-        fetch('header.html')
+        fetch('/header.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('header').innerHTML = data;
             });
   
         // بارگذاری فوتر
-        fetch('footer.html')
+        fetch('/footer.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('footer').innerHTML = data;
@@ -68,6 +68,6 @@
     </div>
     <br>
     <br>
-    <div id="footer"></div>
+    <div id="footer/"></div>
 </body>
 </html>
