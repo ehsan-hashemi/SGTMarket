@@ -19,7 +19,35 @@
           d.getElementsByTagName("head")[0].appendChild(s);
         })();
     </script>
-    
+    <script>
+      // بارگذاری هدر
+      fetch('header.html')
+          .then(response => response.text())
+          .then(data => {
+              document.getElementById('header').innerHTML = data;
+          });
+
+      // بارگذاری فوتر
+      fetch('footer.html')
+          .then(response => response.text())
+          .then(data => {
+              document.getElementById('footer').innerHTML = data;
+          });
+
+      // تبلیغ
+      fetch('/adds/adds1.html')
+          .then(response => response.text())
+          .then(data => {
+              document.getElementById('adds1').innerHTML = data;
+          });
+      
+      // تبلیغ
+      fetch('/adds/adds2.html')
+          .then(response => response.text())
+          .then(data => {
+              document.getElementById('adds2').innerHTML = data;
+          });
+  </script>
 </head>
 <body>
     <header>
@@ -42,45 +70,6 @@
     <a class="eashe" href="/Gif/files/hapynorozgif3/"><p class="pst">گیف تبریک عید نوروز ۳</p><a>
     <br>
     <br>
-    <footer>
-            <div class="footer-container">
-              <div class="footer-section">
-                <h3>دسته‌بندی‌ها</h3>
-                <ul>
-                  <li><a href="https://SGTMarket.ir">خانه</a></li>
-                  <li><a href="/Stickers">استیکر</a></li>
-                  <li><a href="/Gif">گیف</a></li>
-                  <li><a href="/Them">تم</a></li>
-                  <li><a href="/Profiles">عکس پروفایل</a></li>
-                  <li><a href="https://blog.sgtmarket.ir">وبلاگ</a></li>
-                </ul>
-              </div>
-              <div class="footer-section">
-                <div class="fotas">
-                    <h3>تماس با ما</h3>
-                    <a class="dfsgg" href="mailto:info@sgtmarket.ir" target="_blank">ایمیل: info@sgtmarket.ir</a>
-                    <br>
-                    <a class="dfsgg" href="tel:09143654519" target="_blank">تلفن: 09143654519</a>
-                    <br>
-                    <a class="dfsgg" href="https://eitaa.com/admin_ehsan_m" target="_blank">ادمین ایتا: @admin_ehsan_m</a>
-                    <br>
-                    <a class="dfsgg" href="https://bale.ai/ehsan_hashemi_1392" target="_blank">ادمین بله: @ehsan_hashemi_1392</a>
-                    <br>
-                    <a class="dfsgg" href="https://ehsan-hashemi.github.io/M-Programming-Group" target="_blank">سازنده: M Programming Group</a>
-                </div>
-              </div>
-              <div class="footer-section social-media">
-                <h3>ما را دنبال کنید</h3>
-                <a href="https://eitaa.com/SGT_Market" target="_blank"><img src="https://s6.picofile.com/file/8389773534/04.png" alt="ایتا"></a>
-                <a href="https://bale.ir/SGT_Market" target="_blank"><img src="https://logoyab.com/wp-content/uploads/2024/07/Bale-Logo-1030x1030.png" alt="بله"></a>
-              </div>
-            </div>
-        <div class="footer-content">
-            <p class="pte1">© 2025. SGT Market. All rights are reserved.</p>
-            <div class="social-icons">
-                <a href="https://ehsan-hashemi.github.io/M-Programming-Group"><img src="../icon.png" alt="icon"></a>
-            </div>
-        </div>
-    </footer>
+    <div id="footer"></div>
 </body>
 </html>
