@@ -1,0 +1,28 @@
+{
+  "name": "SGT Market",
+  "short_name": "SGT Market",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "id": "sgtmarket-ir",
+  "description": "SGT Market\nversion: 3.2.6",
+  "dir": "rtl",
+  "scope": "sgtmarket-ir",
+  "lang": "fa",
+  "orientation": "any",
+  "display_override": [
+    "browser",
+    "fullscreen",
+    "minimal-ui",
+    "standalone",
+    "window-controls-overlay"
+  ]
+}
