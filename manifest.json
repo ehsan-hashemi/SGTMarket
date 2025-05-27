@@ -11,6 +11,10 @@
       "sizes": "192x192",
       "type": "image/png"
     }
+    {
+      "src": "/AppImages.zip",
+      "sizes": "512x512",
+      "type": "svg"
   ],
   "id": "sgtmarket-ir",
   "description": "SGT Market\nversion: 3.2.6",
