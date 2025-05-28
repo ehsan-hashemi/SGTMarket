@@ -2,6 +2,7 @@
   "name": "SGT Market",
   "short_name": "SGT Market",
   "start_url": "/",
+  "scope": "/"
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
