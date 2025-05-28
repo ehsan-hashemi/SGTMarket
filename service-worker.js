@@ -1,14 +1,7 @@
 self.addEventListener("install", event => {
     event.waitUntil(
         caches.open("sgt-market-cache").then(cache => {
-            return cache.addAll([
-                "/",
-                "/index.html",
-                "/styles.css",
-                "/script.js",
-                "/images/banner.jpg",
-                "/data/products.json"
-            ]);
+            return cache.addAll(["/", "/index.html", "/styles.css", "/script.js"]);
         })
     );
 });
