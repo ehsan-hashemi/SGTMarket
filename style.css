@@ -49,6 +49,7 @@ body {
 .h2c {
     color: #000000;
     font-size: large;
+    cursor: pointer;
 }
 
 .powqp {
