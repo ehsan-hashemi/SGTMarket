@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#d90429" />
+<title>SGT Market — مبدل استیکر</title>
+<link rel="icon" href="/icon.png" type="image/png" />
+<style>
+/* فونت و ریست */
+@font-face{
+  font-family:'Vazir';
+  src:url('/Vazir-Regular.ttf') format('truetype');
+  font-weight:400;font-style:normal;font-display:swap;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Vazir",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#f7f8fa;color:#0f172a;line-height:1.65}
+
+/* متغیرها (تم روشن + قرمز) */
+:root{
+  --red1:#ef233c;
+  --red2:#d90429;
+  --red3:#9b001c;
+  --text:#0f172a;
+  --muted:#6b7280;
+  --bg:#f7f8fa;
+  --surface:#ffffff;
+  --border:#e5e7eb;
+  --radius:18px;
+  --shadow:0 10px 30px rgba(16,24,40,0.08);
+  --accent:#ef233c;
+}
+
+/* هدر اپلیکیشنی */
+.appbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 16px;
+  background:linear-gradient(90deg,var(--red2),var(--red3));
+  color:#fff;box-shadow:0 8px 24px rgba(217,4,41,0.28);
+  backdrop-filter:saturate(1.1);
+}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
+.brand img{width:40px;height:40px;border-radius:12px;box-shadow:0 0 0 2px rgba(255,255,255,0.2)}
+.brand .title{font-weight:900;letter-spacing:-0.2px}
+.brand .subtitle{font-size:0.9rem;color:rgba(255,255,255,0.85)}
+
+/* لایه و کارت */
+.container{max-width:1100px;margin:20px auto;padding:0 16px}
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+/* گرید واکنش‌گرا */
+.grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:980px){.grid{grid-template-columns:1.1fr 0.9fr}}
+
+/* آپلود */
+.zone{
+  border:2px dashed rgba(0,0,0,0.25);
+  border-radius:calc(var(--radius) - 6px);
+  padding:20px;min-height:180px;
+  background:linear-gradient(180deg,#fafafa,#f9fafb);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  text-align:center;cursor:pointer;transition:0.2s ease;
+}
+.zone:hover,.zone.hover{border-color:var(--red1);background:rgba(239,35,60,0.06)}
+.zone .big{
+  font-weight:900;letter-spacing:-0.2px;font-size:1.05rem;
+  background:linear-gradient(45deg,var(--red1),var(--red2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.zone .hint{color:var(--muted);font-size:0.92rem}
+
+/* پیش‌نمایش */
+.preview{display:grid;gap:12px;padding:16px;border-top:1px dashed var(--border)}
+@media (min-width:980px){.preview{border-top:none;border-right:1px dashed var(--border)}}
+.img-wrap{
+  position:relative;width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;
+  background:#f0f2f5;display:grid;place-items:center;border:1px solid var(--border)
+}
+.img-wrap img{max-width:100%;max-height:100%;object-fit:contain;image-rendering:auto}
+.placeholder{position:absolute;color:#9aa3af;text-align:center}
+
+/* دکمه‌ها */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{
+  appearance:none;border:1px solid transparent;border-radius:12px;
+  padding:10px 14px;font-weight:800;cursor:pointer;transition:0.15s ease;box-shadow:var(--shadow)
+}
+.btn.primary{background:linear-gradient(180deg,var(--red1),var(--red2));color:#fff}
+.btn.secondary{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn.ghost{background:transparent;border:1px solid rgba(239,35,60,0.35);color:var(--red1)}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0) scale(0.99)}
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+
+/* اطلاعات و چیپ‌ها */
+.meta{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.chip{
+  background:rgba(239,35,60,0.08);border:1px solid rgba(239,35,60,0.35);
+  color:#7f1d1d;border-radius:999px;padding:6px 10px;font-size:0.9rem;text-align:center
+}
+
+/* ردیف و متن‌های کمک */
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
+.stat{font-size:0.92rem;color:var(--muted)} .value{font-weight:900;color:var(--text)}
+
+/* تنظیمات */
+details{background:#fafafa;border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+summary{cursor:pointer;font-weight:900}
+.slider{width:160px}
+input[type="number"]{
+  width:120px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);
+  background:#fff;color:var(--text)
+}
+
+/* نوار پیشرفت و نوت */
+.progress{height:6px;background:#eef2f7;border-radius:999px;overflow:hidden}
+.bar{width:0%;height:100%;background:linear-gradient(90deg,var(--red1),var(--red2));transition:width 0.3s ease}
+.alert{border:1px dashed var(--border);border-radius:12px;padding:10px 12px;font-size:0.92rem;background:#fff;color:var(--text)}
+.alert.ok{border-color:rgba(46,204,113,0.5);background:#f0fdf4;color:#065f46}
+.alert.warn{border-color:rgba(255,183,3,0.45);background:#fffbeb;color:#92400e}
+.alert.err{border-color:rgba(255,77,79,0.5);background:#fef2f2;color:#991b1b}
+
+/* دسترس‌پذیری */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:10px}
+
+/* فوتر */
+footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <a class="brand" href="#">
+    <img src="/icon.png" alt="SGT Market" />
+    <div>
+      <div class="title">SGT Market</div>
+      <div class="subtitle">مبدل استیکر</div>
+    </div>
+  </a>
+  <div class="controls">
+    <button id="pickBtn" class="btn primary">انتخاب عکس</button>
+    <button id="cameraBtn" class="btn ghost">دوربین</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <div class="grid">
+      <section style="padding:16px;">
+        <div id="dropZone" class="zone" tabindex="0" role="button" aria-label="فایل را بکشید و رها کنید یا برای انتخاب کلیک کنید">
+          <div class="big">بکش و رها کن یا کلیک کن</div>
+          <div class="hint">PNG, JPG, GIF, SVG و …</div>
+          <input id="fileInput" class="sr-only" type="file" accept="image/*" />
+        </div>
+
+        <div style="height:12px"></div>
+
+        <details>
+          <summary>تنظیمات پیشرفته</summary>
+          <div class="row" style="margin-top:8px">
+            <div class="stat">کیفیت WebP</div>
+            <input id="quality" class="slider" type="range" min="60" max="100" value="92" />
+            <div><span id="qVal" class="value">92</span></div>
+          </div>
+          <div class="row">
+            <div class="stat">حداکثر عرض (پیکسل)</div>
+            <input id="maxWidth" type="number" inputmode="numeric" min="0" placeholder="بدون تغییر">
+          </div>
+          <div class="row">
+            <div class="stat">پس‌زمینه شفافیت</div>
+            <input id="bgColor" type="color" value="#000000" />
+          </div>
+        </details>
+
+        <div style="height:12px"></div>
+
+        <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
+        <div id="note" class="alert warn" style="display:none;margin-top:12px"></div>
+      </section>
+
+      <aside class="preview">
+        <div class="img-wrap">
+          <img id="preview" alt="پیش‌نمایش" />
+          <div id="placeholder" class="placeholder">هنوز عکسی انتخاب نشده است.</div>
+        </div>
+
+        <div class="meta">
+          <div class="chip">حجم ورودی: <span id="inSize">۰</span></div>
+          <div class="chip">حجم خروجی: <span id="outSize">۰</span></div>
+          <div class="chip">ابعاد: <span id="dims">—</span></div>
+          <div class="chip">صرفه‌جویی: <span id="saved">—</span></div>
+        </div>
+
+        <div class="row">
+          <div class="controls">
+            <button id="saveBtn" class="btn secondary" disabled>ذخیره</button>
+            <button id="shareBtn" class="btn secondary" disabled>اشتراک‌گذاری</button>
+          </div>
+          <button id="resetBtn" class="btn ghost" disabled>بازنشانی</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <footer>© 2025 SGT Market</footer>
+</div>
+
+<script type="module">
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const pickBtn = document.getElementById('pickBtn');
+const cameraBtn = document.getElementById('cameraBtn');
+
+const preview = document.getElementById('preview');
+const placeholder = document.getElementById('placeholder');
+const inSize = document.getElementById('inSize');
+const outSize = document.getElementById('outSize');
+const dims = document.getElementById('dims');
+const saved = document.getElementById('saved');
+const bar = document.getElementById('bar');
+
+const saveBtn = document.getElementById('saveBtn');
+const shareBtn = document.getElementById('shareBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const note = document.getElementById('note');
+const quality = document.getElementById('quality');
+const qVal = document.getElementById('qVal');
+const maxWidth = document.getElementById('maxWidth');
+const bgColor = document.getElementById('bgColor');
+
+let originalFile = null;
+let outputBlob = null;
+let outputURL = null;
+let outputName = null;
+let imgWidth = 0, imgHeight = 0;
+
+const fmtBytes = (b) => {
+  if (!b && b !== 0) return '—';
+  const u = ['B','KB','MB','GB'];
+  let i = 0, v = b;
+  while (v >= 1024 && i < u.length-1){ v/=1024; i++; }
+  return (Math.round(v*10)/10)+' '+u[i];
+};
+
+const setBar = (p) => { bar.style.width = Math.max(0, Math.min(100, p)) + '%'; };
+
+const showNote = (msg, type='warn') => {
+  note.textContent = msg;
+  note.className = 'alert ' + type;
+  note.style.display = 'block';
+};
+const hideNote = () => { note.style.display = 'none'; };
+
+const resetState = () => {
+  originalFile = null;
+  if (outputURL) URL.revokeObjectURL(outputURL);
+  outputURL = null;
+  outputBlob = null;
+  outputName = null;
+  preview.removeAttribute('src');
+  placeholder.style.display = 'block';
+  inSize.textContent = '۰';
+  outSize.textContent = '۰';
+  dims.textContent = '—';
+  saved.textContent = '—';
+  saveBtn.disabled = true;
+  shareBtn.disabled = true;
+  resetBtn.disabled = true;
+  setBar(0);
+  hideNote();
+};
+resetState();
+
+qVal.textContent = quality.value;
+quality.addEventListener('input', () => qVal.textContent = quality.value);
+
+pickBtn.addEventListener('click', () => fileInput.click());
+cameraBtn.addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.onchange = () => input.files && input.files[0] && handleFile(input.files[0]);
+  input.click();
+});
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+});
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('hover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('hover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault(); dropZone.classList.remove('hover');
+  const file = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (file) handleFile(file);
+});
+resetBtn.addEventListener('click', resetState);
+
+async function handleFile(file){
+  resetState();
+  originalFile = file;
+  inSize.textContent = fmtBytes(file.size);
+  const base = (file.name || 'image').replace(/\.[^.]+$/, '');
+  outputName = base + '.webp';
+
+  try{
+    setBar(10);
+    const objectURL = URL.createObjectURL(file);
+    let bitmap = null;
+    try{
+      bitmap = await createImageBitmap(file);
+    }catch{
+      bitmap = await new Promise((res, rej) => {
+        const img = new Image();
+        img.onload = () => res(img);
+        img.onerror = () => rej(new Error('فرمت پشتیبانی نمی‌شود.'));
+        img.src = objectURL;
+      });
+    }
+
+    imgWidth = bitmap.width;
+    imgHeight = bitmap.height;
+
+    let targetW = imgWidth, targetH = imgHeight;
+    const maxW = parseInt(maxWidth.value || '0', 10);
+    if (maxW > 0 && imgWidth > maxW){
+      const scale = maxW / imgWidth;
+      targetW = Math.max(1, Math.round(imgWidth * scale));
+      targetH = Math.max(1, Math.round(imgHeight * scale));
+    }
+
+    setBar(35);
+    const canvas = document.createElement('canvas');
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext('2d', { alpha: true });
+
+    // کیفیت رسم بالا
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // پس‌زمینه برای شفافیت
+    if (bgColor.value && bgColor.value !== '#000000') {
+      ctx.fillStyle = bgColor.value;
+      ctx.fillRect(0, 0, targetW, targetH);
+    } else {
+      ctx.clearRect(0, 0, targetW, targetH);
+    }
+
+    ctx.drawImage(bitmap, 0, 0, targetW, targetH);
+    if ('close' in bitmap) bitmap.close?.();
+
+    setBar(60);
+
+    // بررسی پشتیبانی WebP
+    const supportsWebP = (() => {
+      try {
+        const c = document.createElement('canvas');
+        return c.toDataURL('image/webp').startsWith('data:image/webp');
+      } catch { return false; }
+    })();
+    if (!supportsWebP) {
+      showNote('مرورگر شما خروجی WebP را پشتیبانی نمی‌کند.', 'err');
+      setBar(0);
+      return;
+    }
+
+    const q = Math.max(0.6, Math.min(1, (parseInt(quality.value, 10) || 92) / 100));
+    const blob = await new Promise((res, rej) => {
+      canvas.toBlob(b => b ? res(b) : rej(new Error('تبدیل ناموفق')), 'image/webp', q);
+    });
+
+    outputBlob = blob;
+    if (outputURL) URL.revokeObjectURL(outputURL);
+    outputURL = URL.createObjectURL(blob);
+
+    preview.src = outputURL;
+    preview.onload = () => { placeholder.style.display = 'none'; };
+
+    dims.textContent = targetW + '×' + targetH;
+    outSize.textContent = fmtBytes(blob.size);
+    const gain = originalFile.size > 0 ? Math.max(0, 100 - Math.round((blob.size / originalFile.size) * 100)) : 0;
+    saved.textContent = gain + '٪';
+
+    setBar(100);
+    saveBtn.disabled = false;
+    shareBtn.disabled = false;
+    resetBtn.disabled = false;
+
+  } catch {
+    showNote('خطا در تبدیل تصویر.', 'err');
+    setBar(0);
+  }
+}
+
+saveBtn.addEventListener('click', () => {
+  if (!outputBlob) return;
+  const a = document.createElement('a');
+  a.href = outputURL;
+  a.download = outputName || 'image.webp';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+
+shareBtn.addEventListener('click', async () => {
+  if (!outputBlob) return;
+  try {
+    const file = new File([outputBlob], outputName || 'image.webp', { type: 'image/webp' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ title:'تصویر WebP', files:[file] });
+    } else if (navigator.share) {
+      await navigator.share({ title:'تصویر WebP', text:'تصویر آماده اشتراک است.' });
+      showNote('برای اشتراک مستقیم فایل، از مرورگری با Web Share سطح فایل استفاده کنید.', 'warn');
+    } else {
+      showNote('این دستگاه از پنل اشتراک‌گذاری پشتیبانی نمی‌کند.', 'warn');
+    }
+  } catch (err) {
+    if (err && err.name === 'AbortError') return;
+    showNote('اشتراک‌گذاری ناموفق بود.', 'err');
+  }
+});
+</script>
+</body>
+</html>
