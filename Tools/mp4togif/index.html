@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#d90429" />
-<title>SGT Market — مبدل استیکر</title>
+<title>SGT Market — تبدیل MP4 به GIF</title>
 <link rel="icon" href="/icon.png" type="image/png" />
 <style>
 @font-face{
@@ -69,7 +69,7 @@ summary{cursor:pointer;font-weight:900}
 input[type="number"], select{
   width:140px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)
 }
-.switch{display:flex;align-items:center;gap:8px}
+input[type="time"]{width:130px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
 .progress{height:6px;background:#eef2f7;border-radius:999px;overflow:hidden}
 .bar{width:0%;height:100%;background:linear-gradient(90deg,var(--red1),var(--red2));transition:width 0.3s ease}
 .alert{border:1px dashed var(--border);border-radius:12px;padding:10px 12px;font-size:0.92rem;background:#fff;color:var(--text)}
@@ -88,11 +88,11 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
     <img src="/icon.png" alt="SGT Market" />
     <div>
       <div class="title">SGT Market</div>
-      <div class="subtitle">مبدل استیکر</div>
+      <div class="subtitle">تبدیل MP4 به GIF</div>
     </div>
   </a>
   <div class="controls">
-    <button id="pickBtn" class="btn primary">انتخاب عکس</button>
+    <button id="pickBtn" class="btn primary">انتخاب ویدیو</button>
     <button id="cameraBtn" class="btn ghost">دوربین</button>
   </div>
 </header>
@@ -101,10 +101,10 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
   <div class="card">
     <div class="grid">
       <section style="padding:16px;">
-        <div id="dropZone" class="zone" tabindex="0" role="button" aria-label="فایل را بکشید و رها کنید یا برای انتخاب کلیک کنید">
+        <div id="dropZone" class="zone" tabindex="0" role="button" aria-label="ویدیو را بکشید و رها کنید یا کلیک کنید">
           <div class="big">بکش و رها کن یا کلیک کن</div>
-          <div class="hint">PNG, JPG, GIF, SVG و …</div>
-          <input id="fileInput" class="sr-only" type="file" accept="image/*" />
+          <div class="hint">MP4, WebM, MOV و …</div>
+          <input id="fileInput" class="sr-only" type="file" accept="video/mp4,video/webm,video/quicktime,video/*" />
         </div>
 
         <div style="height:12px"></div>
@@ -112,38 +112,30 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
         <details>
           <summary>تنظیمات پیشرفته</summary>
           <div class="row" style="margin-top:8px">
-            <div class="stat">کیفیت WebP</div>
-            <input id="quality" class="slider" type="range" min="60" max="100" value="92" />
-            <div><span id="qVal" class="value">92</span></div>
+            <div class="stat">فریم‌ریت (FPS)</div>
+            <input id="fps" class="slider" type="range" min="5" max="30" value="12" />
+            <div><span id="fpsVal" class="value">12</span></div>
           </div>
           <div class="row">
-            <div class="stat">فرمت خروجی</div>
-            <select id="outFormat">
-              <option value="webp" selected>WebP</option>
-              <option value="png">PNG</option>
-            </select>
-          </div>
-          <div class="row">
-            <div class="stat">پیش‌تنظیم اندازه</div>
-            <select id="presetSize">
+            <div class="stat">پیش‌تنظیم عرض</div>
+            <select id="presetWidth">
               <option value="0" selected>بدون تغییر</option>
-              <option value="512">512×512 (مناسب استیکر)</option>
-              <option value="320">320×320</option>
+              <option value="320">320 px</option>
+              <option value="480">480 px</option>
+              <option value="640">640 px</option>
             </select>
           </div>
           <div class="row">
-            <label class="switch">
-              <input id="squareFit" type="checkbox" />
-              <span class="stat">خروجی مربعی و مرکزچین</span>
-            </label>
+            <div class="stat">عرض سفارشی</div>
+            <input id="customWidth" type="number" inputmode="numeric" min="0" placeholder="بدون تغییر">
           </div>
           <div class="row">
-            <div class="stat">حداکثر عرض (پیکسل)</div>
-            <input id="maxWidth" type="number" inputmode="numeric" min="0" placeholder="بدون تغییر">
+            <div class="stat">شروع</div>
+            <input id="startTime" type="time" step="1" value="00:00:00" />
           </div>
           <div class="row">
-            <div class="stat">پس‌زمینه شفافیت</div>
-            <input id="bgColor" type="color" value="#000000" />
+            <div class="stat">مدت (ثانیه)</div>
+            <input id="duration" type="number" min="0" placeholder="کل ویدیو">
           </div>
         </details>
 
@@ -155,14 +147,15 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
 
       <aside class="preview">
         <div class="img-wrap">
-          <img id="preview" alt="پیش‌نمایش" />
-          <div id="placeholder" class="placeholder">هنوز عکسی انتخاب نشده است.</div>
+          <img id="preview" alt="پیش‌نمایش GIF" />
+          <div id="placeholder" class="placeholder">ویدیویی انتخاب نشده است.</div>
         </div>
 
         <div class="meta">
           <div class="chip">حجم ورودی: <span id="inSize">۰</span></div>
           <div class="chip">حجم خروجی: <span id="outSize">۰</span></div>
           <div class="chip">ابعاد: <span id="dims">—</span></div>
+          <div class="chip">طول ویدیو: <span id="vidLen">—</span></div>
           <div class="chip">صرفه‌جویی: <span id="saved">—</span></div>
         </div>
 
@@ -180,7 +173,11 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
   <footer>© 2025 SGT Market</footer>
 </div>
 
+<!-- FFmpeg WASM -->
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
 <script type="module">
+const { createFFmpeg, fetchFile } = FFmpeg;
+
 const fileInput = document.getElementById('fileInput');
 const dropZone = document.getElementById('dropZone');
 const pickBtn = document.getElementById('pickBtn');
@@ -192,6 +189,7 @@ const inSize = document.getElementById('inSize');
 const outSize = document.getElementById('outSize');
 const dims = document.getElementById('dims');
 const saved = document.getElementById('saved');
+const vidLen = document.getElementById('vidLen');
 const bar = document.getElementById('bar');
 
 const saveBtn = document.getElementById('saveBtn');
@@ -199,57 +197,69 @@ const shareBtn = document.getElementById('shareBtn');
 const resetBtn = document.getElementById('resetBtn');
 
 const note = document.getElementById('note');
-const quality = document.getElementById('quality');
-const qVal = document.getElementById('qVal');
-const maxWidth = document.getElementById('maxWidth');
-const bgColor = document.getElementById('bgColor');
-const outFormat = document.getElementById('outFormat');
-const presetSize = document.getElementById('presetSize');
-const squareFit = document.getElementById('squareFit');
+const fps = document.getElementById('fps');
+const fpsVal = document.getElementById('fpsVal');
+const presetWidth = document.getElementById('presetWidth');
+const customWidth = document.getElementById('customWidth');
+const startTime = document.getElementById('startTime');
+const duration = document.getElementById('duration');
 
 let originalFile = null;
 let outputBlob = null;
 let outputURL = null;
 let outputName = null;
-let imgWidth = 0, imgHeight = 0;
+let videoW = 0, videoH = 0, videoDur = 0;
+
+const ffmpeg = createFFmpeg({
+  log: false,
+  corePath: 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg-core.js',
+});
 
 const fmtBytes = (b) => {
   if (!b && b !== 0) return '—';
   const u = ['B','KB','MB','GB'];
-  let i = 0, v = b;
-  while (v >= 1024 && i < u.length-1){ v/=1024; i++; }
+  let i=0,v=b; while(v>=1024 && i<u.length-1){v/=1024;i++;}
   return (Math.round(v*10)/10)+' '+u[i];
 };
 const setBar = (p) => { bar.style.width = Math.max(0, Math.min(100, p)) + '%'; };
 const showNote = (msg, type='warn') => { note.textContent = msg; note.className = 'alert ' + type; note.style.display = 'block'; };
 const hideNote = () => { note.style.display = 'none'; };
+const toHHMMSS = s => {
+  s = Math.max(0, Math.floor(s||0));
+  const h = String(Math.floor(s/3600)).padStart(2,'0');
+  const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
+  const sec = String(s%60).padStart(2,'0');
+  return `${h}:${m}:${sec}`;
+};
+const parseTime = (hhmmss) => {
+  const [h,m,s] = (hhmmss||'00:00:00').split(':').map(x=>parseInt(x||'0',10));
+  return (h*3600)+(m*60)+(s||0);
+};
 
 const resetState = () => {
   originalFile = null;
   if (outputURL) URL.revokeObjectURL(outputURL);
   outputURL = null; outputBlob = null; outputName = null;
   preview.removeAttribute('src'); placeholder.style.display = 'block';
-  inSize.textContent = '۰'; outSize.textContent = '۰'; dims.textContent = '—'; saved.textContent = '—';
+  inSize.textContent = '۰'; outSize.textContent = '۰'; dims.textContent = '—'; saved.textContent = '—'; vidLen.textContent='—';
   saveBtn.disabled = true; shareBtn.disabled = true; resetBtn.disabled = true;
   setBar(0); hideNote();
 };
 resetState();
 
-qVal.textContent = quality.value;
-quality.addEventListener('input', () => qVal.textContent = quality.value);
+fpsVal.textContent = fps.value;
+fps.addEventListener('input', () => fpsVal.textContent = fps.value);
 
 pickBtn.addEventListener('click', () => fileInput.click());
 cameraBtn.addEventListener('click', () => {
   const input = document.createElement('input');
-  input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
+  input.type = 'file'; input.accept = 'video/*'; input.capture = 'environment';
   input.onchange = () => input.files && input.files[0] && handleFile(input.files[0]);
   input.click();
 });
 
 dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
-});
+dropZone.addEventListener('keydown', (e) => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); fileInput.click(); } });
 dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('hover'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('hover'));
 dropZone.addEventListener('drop', (e) => {
@@ -263,122 +273,101 @@ fileInput.addEventListener('change', (e) => {
 });
 resetBtn.addEventListener('click', resetState);
 
+async function probeVideo(file){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.preload = 'metadata';
+    v.onloadedmetadata = () => {
+      const info = { w: v.videoWidth || 0, h: v.videoHeight || 0, d: v.duration || 0 };
+      URL.revokeObjectURL(url);
+      res(info);
+    };
+    v.onerror = () => { URL.revokeObjectURL(url); rej(new Error('خطا در خواندن ویدیو.')); };
+    v.src = url;
+  });
+}
+
+async function ensureFFmpeg(){
+  if (!ffmpeg.isLoaded()){
+    setBar(5);
+    showNote('در حال بارگذاری موتور تبدیل…', 'warn');
+    ffmpeg.setProgress(({ ratio }) => setBar(Math.round(ratio*80)));
+    await ffmpeg.load();
+    hideNote();
+  }
+}
+
 async function handleFile(file){
   resetState();
   originalFile = file;
   inSize.textContent = fmtBytes(file.size);
-  const base = (file.name || 'image').replace(/\.[^.]+$/, '');
-  const desiredExt = outFormat.value === 'png' ? '.png' : '.webp';
-  outputName = base + desiredExt;
+  const base = (file.name || 'video').replace(/\.[^.]+$/, '');
+  outputName = base + '.gif';
 
   try{
+    const meta = await probeVideo(file);
+    videoW = meta.w; videoH = meta.h; videoDur = isFinite(meta.d) ? meta.d : 0;
+    dims.textContent = (videoW && videoH) ? (videoW + '×' + videoH) : '—';
+    vidLen.textContent = videoDur ? toHHMMSS(videoDur) : '—';
+    resetBtn.disabled = true;
+
+    await ensureFFmpeg();
+
     setBar(10);
-    const objectURL = URL.createObjectURL(file);
-    let bitmap = null;
-    try{ bitmap = await createImageBitmap(file); }
-    catch{
-      bitmap = await new Promise((res, rej) => {
-        const img = new Image();
-        img.onload = () => res(img);
-        img.onerror = () => rej(new Error('فرمت پشتیبانی نمی‌شود.'));
-        img.src = objectURL;
-      });
-    }
 
-    imgWidth = bitmap.width; imgHeight = bitmap.height;
+    ffmpeg.FS('writeFile', 'in.mp4', await fetchFile(file));
 
-    const preset = parseInt(presetSize.value || '0', 10);
-    const maxWNum = parseInt(maxWidth.value || '0', 10);
+    // Params
+    const fpsValNum = parseInt(fps.value, 10) || 12;
+    const presetW = parseInt(presetWidth.value || '0', 10);
+    const customW = parseInt(customWidth.value || '0', 10);
+    const targetW = customW > 0 ? customW : (presetW > 0 ? presetW : 0);
+    const startSec = parseTime(startTime.value || '00:00:00');
+    const durSec = parseInt(duration.value || '0', 10);
 
-    let targetW = imgWidth, targetH = imgHeight;
+    const vfParts = [`fps=${fpsValNum}`];
+    if (targetW > 0) vfParts.push(`scale=${targetW}:-1:flags=lanczos`);
+    // palette pipeline for high quality
+    const vf = `${vfParts.join(',')},split[s0][s1];[s0]palettegen=stats_mode=full[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5`;
 
-    if (preset > 0 && squareFit.checked){
-      targetW = targetH = preset;
-    } else {
-      if (maxWNum > 0 && imgWidth > maxWNum){
-        const scale = maxWNum / imgWidth;
-        targetW = Math.max(1, Math.round(imgWidth * scale));
-        targetH = Math.max(1, Math.round(imgHeight * scale));
-      }
-      if (preset > 0 && !squareFit.checked){
-        const scale = Math.min(1, preset / Math.max(targetW, targetH));
-        targetW = Math.max(1, Math.round(targetW * scale));
-        targetH = Math.max(1, Math.round(targetH * scale));
-      }
-    }
+    const args = [];
+    if (startSec > 0) args.push('-ss', String(startSec));
+    if (durSec > 0) args.push('-t', String(durSec));
+    args.push('-i','in.mp4','-vf',vf,'-loop','0','-f','gif','out.gif');
 
-    setBar(35);
+    showNote('در حال تبدیل… لطفاً منتظر بمانید.', 'warn');
 
-    let canvasW = targetW, canvasH = targetH;
-    if (preset > 0 && squareFit.checked){
-      canvasW = canvasH = preset;
-    }
+    await ffmpeg.run(...args);
 
-    const canvas = document.createElement('canvas');
-    canvas.width = canvasW; canvas.height = canvasH;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-
-    if (bgColor.value && bgColor.value !== '#000000') {
-      ctx.fillStyle = bgColor.value;
-      ctx.fillRect(0, 0, canvasW, canvasH);
-    } else {
-      ctx.clearRect(0, 0, canvasW, canvasH);
-    }
-
-    let drawX = 0, drawY = 0, drawW = targetW, drawH = targetH;
-    if (preset > 0 && squareFit.checked){
-      const scale = Math.min(canvasW / imgWidth, canvasH / imgHeight);
-      drawW = Math.max(1, Math.round(imgWidth * scale));
-      drawH = Math.max(1, Math.round(imgHeight * scale));
-      drawX = Math.floor((canvasW - drawW) / 2);
-      drawY = Math.floor((canvasH - drawH) / 2);
-    }
-
-    ctx.drawImage(bitmap, drawX, drawY, drawW, drawH);
-    if ('close' in bitmap) bitmap.close?.();
-
-    setBar(60);
-
-    const type = outFormat.value === 'png' ? 'image/png' : 'image/webp';
-    if (type === 'image/webp'){
-      const supportsWebP = (() => {
-        try { const c = document.createElement('canvas'); return c.toDataURL('image/webp').startsWith('data:image/webp'); }
-        catch { return false; }
-      })();
-      if (!supportsWebP) {
-        showNote('مرورگر شما خروجی WebP را پشتیبانی نمی‌کند.', 'err');
-        setBar(0);
-        return;
-      }
-    }
-
-    const q = Math.max(0.6, Math.min(1, (parseInt(quality.value, 10) || 92) / 100));
-    const blob = await new Promise((res, rej) => {
-      if (type === 'image/png'){
-        canvas.toBlob(b => b ? res(b) : rej(new Error('تبدیل ناموفق')), 'image/png');
-      } else {
-        canvas.toBlob(b => b ? res(b) : rej(new Error('تبدیل ناموفق')), 'image/webp', q);
-      }
-    });
-
-    outputBlob = blob;
+    const data = ffmpeg.FS('readFile','out.gif');
+    outputBlob = new Blob([data.buffer], { type: 'image/gif' });
     if (outputURL) URL.revokeObjectURL(outputURL);
-    outputURL = URL.createObjectURL(blob);
+    outputURL = URL.createObjectURL(outputBlob);
 
     preview.src = outputURL;
     preview.onload = () => { placeholder.style.display = 'none'; };
 
-    dims.textContent = canvasW + '×' + canvasH;
-    outSize.textContent = fmtBytes(blob.size);
-    const gain = originalFile.size > 0 ? Math.max(0, 100 - Math.round((blob.size / originalFile.size) * 100)) : 0;
+    // Dimensions after scale (estimate)
+    if (targetW > 0 && videoW > 0 && videoH > 0){
+      const scale = targetW / videoW;
+      dims.textContent = Math.max(1, Math.round(videoW*scale)) + '×' + Math.max(1, Math.round(videoH*scale));
+    }
+
+    outSize.textContent = fmtBytes(outputBlob.size);
+    const gain = originalFile.size > 0 ? Math.max(0, 100 - Math.round((outputBlob.size / originalFile.size) * 100)) : 0;
     saved.textContent = gain + '٪';
 
-    setBar(100);
     saveBtn.disabled = false; shareBtn.disabled = false; resetBtn.disabled = false;
+    hideNote();
+    setBar(100);
 
-  } catch {
-    showNote('خطا در تبدیل تصویر.', 'err');
+    // cleanup temp files
+    try{ ffmpeg.FS('unlink','in.mp4'); ffmpeg.FS('unlink','out.gif'); }catch{}
+
+  } catch (e){
+    console.error(e);
+    showNote('خطا در تبدیل ویدیو به GIF.', 'err');
     setBar(0);
   }
 }
@@ -386,18 +375,18 @@ async function handleFile(file){
 saveBtn.addEventListener('click', () => {
   if (!outputBlob) return;
   const a = document.createElement('a');
-  a.href = outputURL; a.download = outputName || (outFormat.value==='png'?'image.png':'image.webp');
+  a.href = outputURL; a.download = outputName || 'output.gif';
   document.body.appendChild(a); a.click(); a.remove();
 });
 
 shareBtn.addEventListener('click', async () => {
   if (!outputBlob) return;
   try {
-    const file = new File([outputBlob], outputName || (outFormat.value==='png'?'image.png':'image.webp'), { type: outFormat.value==='png'?'image/png':'image/webp' });
+    const file = new File([outputBlob], outputName || 'output.gif', { type: 'image/gif' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ title:'فایل خروجی', files:[file] });
+      await navigator.share({ title:'GIF خروجی', files:[file] });
     } else if (navigator.share) {
-      await navigator.share({ title:'لینک خروجی', text:'فایل آماده اشتراک است.' });
+      await navigator.share({ title:'GIF خروجی', text:'فایل آماده اشتراک است.' });
       showNote('برای اشتراک مستقیم فایل، مرورگری با Web Share سطح فایل نیاز است.', 'warn');
     } else {
       showNote('این دستگاه از پنل اشتراک‌گذاری پشتیبانی نمی‌کند.', 'warn');

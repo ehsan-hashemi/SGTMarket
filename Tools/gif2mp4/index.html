@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#d90429" />
+<title>SGT Market — تبدیل GIF به ویدیو</title>
+<link rel="icon" href="/icon.png" type="image/png" />
+<style>
+@font-face{font-family:'Vazir';src:url('/Vazir-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Vazir",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#f7f8fa;color:#0f172a;line-height:1.65}
+:root{--red1:#ef233c;--red2:#d90429;--red3:#9b001c;--text:#0f172a;--muted:#6b7280;--bg:#f7f8fa;--surface:#ffffff;--border:#e5e7eb;--radius:18px;--shadow:0 10px 30px rgba(16,24,40,0.08);--accent:#ef233c}
+.appbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:linear-gradient(90deg,var(--red2),var(--red3));color:#fff;box-shadow:0 8px 24px rgba(217,4,41,0.28)}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
+.brand img{width:40px;height:40px;border-radius:12px;box-shadow:0 0 0 2px rgba(255,255,255,0.2)}
+.brand .title{font-weight:900;letter-spacing:-0.2px}
+.brand .subtitle{font-size:0.9rem;color:rgba(255,255,255,0.85)}
+.container{max-width:1100px;margin:20px auto;padding:0 16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:980px){.grid{grid-template-columns:1.1fr 0.9fr}}
+.zone{border:2px dashed rgba(0,0,0,0.25);border-radius:calc(var(--radius) - 6px);padding:20px;min-height:180px;background:linear-gradient(180deg,#fafafa,#f9fafb);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;cursor:pointer;transition:0.2s ease}
+.zone:hover,.zone.hover{border-color:var(--red1);background:rgba(239,35,60,0.06)}
+.zone .big{font-weight:900;letter-spacing:-0.2px;font-size:1.05rem;background:linear-gradient(45deg,var(--red1),var(--red2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.zone .hint{color:var(--muted);font-size:0.92rem}
+.preview{display:grid;gap:12px;padding:16px;border-top:1px dashed var(--border)}
+@media (min-width:980px){.preview{border-top:none;border-right:1px dashed var(--border)}}
+.vid-wrap{position:relative;width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#f0f2f5;display:grid;place-items:center;border:1px solid var(--border)}
+.vid-wrap video{max-width:100%;max-height:100%;object-fit:contain;background:#000}
+.placeholder{position:absolute;color:#9aa3af;text-align:center}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{appearance:none;border:1px solid transparent;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;transition:0.15s ease;box-shadow:var(--shadow)}
+.btn.primary{background:linear-gradient(180deg,var(--red1),var(--red2));color:#fff}
+.btn.secondary{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn.ghost{background:transparent;border:1px solid rgba(239,35,60,0.35);color:var(--red1)}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0) scale(0.99)}
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+.meta{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.chip{background:rgba(239,35,60,0.08);border:1px solid rgba(239,35,60,0.35);color:#7f1d1d;border-radius:999px;padding:6px 10px;font-size:0.9rem;text-align:center}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
+.stat{font-size:0.92rem;color:var(--muted)} .value{font-weight:900;color:var(--text)}
+details{background:#fafafa;border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+summary{cursor:pointer;font-weight:900}
+.slider{width:160px}
+input[type="number"], select{width:140px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
+input[type="time"]{width:130px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
+input[type="color"]{width:44px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;padding:0}
+.progress{height:6px;background:#eef2f7;border-radius:999px;overflow:hidden}
+.bar{width:0%;height:100%;background:linear-gradient(90deg,var(--red1),var(--red2));transition:width 0.3s ease}
+.alert{border:1px dashed var(--border);border-radius:12px;padding:10px 12px;font-size:0.92rem;background:#fff;color:var(--text)}
+.alert.ok{border-color:rgba(46,204,113,0.5);background:#f0fdf4;color:#065f46}
+.alert.warn{border-color:rgba(255,183,3,0.45);background:#fffbeb;color:#92400e}
+.alert.err{border-color:rgba(255,77,79,0.5);background:#fef2f2;color:#991b1b}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:10px}
+footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <a class="brand" href="#">
+    <img src="/icon.png" alt="SGT Market" />
+    <div>
+      <div class="title">SGT Market</div>
+      <div class="subtitle">تبدیل GIF به ویدیو</div>
+    </div>
+  </a>
+  <div class="controls">
+    <button id="pickBtn" class="btn primary">انتخاب GIF</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <div class="grid">
+      <section style="padding:16px;">
+        <div id="dropZone" class="zone" tabindex="0" role="button" aria-label="GIF را بکشید و رها کنید یا کلیک کنید">
+          <div class="big">بکش و رها کن یا کلیک کن</div>
+          <div class="hint">GIF انیمیشنی</div>
+          <input id="fileInput" class="sr-only" type="file" accept="image/gif" />
+        </div>
+
+        <div style="height:12px"></div>
+
+        <details>
+          <summary>تنظیمات پیشرفته</summary>
+          <div class="row" style="margin-top:8px">
+            <div class="stat">فریم‌ریت خروجی (FPS)</div>
+            <input id="fps" class="slider" type="range" min="5" max="60" value="24" />
+            <div><span id="fpsVal" class="value">24</span></div>
+          </div>
+          <div class="row">
+            <div class="stat">عرض خروجی</div>
+            <select id="presetWidth">
+              <option value="0" selected>بدون تغییر</option>
+              <option value="360">360 px</option>
+              <option value="480">480 px</option>
+              <option value="720">720 px</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="stat">عرض سفارشی</div>
+            <input id="customWidth" type="number" inputmode="numeric" min="0" placeholder="بدون تغییر">
+          </div>
+          <div class="row">
+            <div class="stat">رنگ پس‌زمینه (برای شفافیت)</div>
+            <input id="bgColor" type="color" value="#000000" />
+          </div>
+          <div class="row">
+            <div class="stat">شروع</div>
+            <input id="startTime" type="time" step="1" value="00:00:00" />
+          </div>
+          <div class="row">
+            <div class="stat">مدت (ثانیه)</div>
+            <input id="duration" type="number" min="0" placeholder="کل GIF">
+          </div>
+          <div class="row">
+            <div class="stat">فرمت خروجی</div>
+            <select id="outFormat">
+              <option value="mp4" selected>MP4 (سازگاری بالا)</option>
+              <option value="webm">WebM (کیفیت خوب)</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="stat">کیفیت/فشرده‌سازی</div>
+            <select id="quality">
+              <option value="high" selected>High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </details>
+
+        <div style="height:12px"></div>
+
+        <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
+        <div id="note" class="alert warn" style="display:none;margin-top:12px"></div>
+      </section>
+
+      <aside class="preview">
+        <div class="vid-wrap">
+          <video id="preview" controls playsinline></video>
+          <div id="placeholder" class="placeholder">فایلی انتخاب نشده است.</div>
+        </div>
+
+        <div class="meta">
+          <div class="chip">حجم ورودی: <span id="inSize">۰</span></div>
+          <div class="chip">حجم خروجی: <span id="outSize">۰</span></div>
+          <div class="chip">ابعاد: <span id="dims">—</span></div>
+          <div class="chip">مدت: <span id="vidLen">—</span></div>
+          <div class="chip">صرفه‌جویی: <span id="saved">—</span></div>
+        </div>
+
+        <div class="row">
+          <div class="controls">
+            <button id="saveBtn" class="btn secondary" disabled>ذخیره</button>
+            <button id="shareBtn" class="btn secondary" disabled>اشتراک‌گذاری</button>
+          </div>
+          <button id="resetBtn" class="btn ghost" disabled>بازنشانی</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <footer>© 2025 SGT Market</footer>
+</div>
+
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+<script type="module">
+const { createFFmpeg, fetchFile } = FFmpeg;
+
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const pickBtn = document.getElementById('pickBtn');
+
+const preview = document.getElementById('preview');
+const placeholder = document.getElementById('placeholder');
+const inSize = document.getElementById('inSize');
+const outSize = document.getElementById('outSize');
+const dims = document.getElementById('dims');
+const saved = document.getElementById('saved');
+const vidLen = document.getElementById('vidLen');
+const bar = document.getElementById('bar');
+
+const saveBtn = document.getElementById('saveBtn');
+const shareBtn = document.getElementById('shareBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const note = document.getElementById('note');
+const fps = document.getElementById('fps');
+const fpsVal = document.getElementById('fpsVal');
+const presetWidth = document.getElementById('presetWidth');
+const customWidth = document.getElementById('customWidth');
+const startTime = document.getElementById('startTime');
+const duration = document.getElementById('duration');
+const outFormat = document.getElementById('outFormat');
+const quality = document.getElementById('quality');
+const bgColor = document.getElementById('bgColor');
+
+let originalFile = null;
+let outputBlob = null;
+let outputURL = null;
+let outputName = null;
+let gifW = 0, gifH = 0, gifDur = 0;
+
+const ffmpeg = createFFmpeg({
+  log: false,
+  corePath: 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg-core.js',
+});
+
+const fmtBytes = (b) => { if (!b && b !== 0) return '—'; const u=['B','KB','MB','GB']; let i=0,v=b; while(v>=1024&&i<u.length-1){v/=1024;i++;} return (Math.round(v*10)/10)+' '+u[i]; };
+const setBar = (p) => { bar.style.width = Math.max(0, Math.min(100, p)) + '%'; };
+const showNote = (m,t='warn') => { note.textContent=m; note.className='alert '+t; note.style.display='block'; };
+const hideNote = () => { note.style.display='none'; };
+const toHHMMSS = s => { s=Math.max(0,Math.floor(s||0)); const h=String(Math.floor(s/3600)).padStart(2,'0'); const m=String(Math.floor((s%3600)/60)).padStart(2,'0'); const sec=String(s%60).padStart(2,'0'); return `${h}:${m}:${sec}`; };
+const parseTime = (t) => { const [h,m,s]=(t||'00:00:00').split(':').map(x=>parseInt(x||'0',10)); return (h*3600)+(m*60)+(s||0); };
+const hexToFF = (hex) => { const m = /^#?([a-f0-9]{6})$/i.exec(hex||'#000000'); return m ? '0x'+m[1] : '0x000000'; };
+
+const resetState = () => {
+  originalFile = null;
+  if (outputURL) URL.revokeObjectURL(outputURL);
+  outputURL = null; outputBlob = null; outputName = null;
+  preview.removeAttribute('src'); preview.removeAttribute('poster'); preview.load?.();
+  placeholder.style.display = 'block';
+  inSize.textContent = '۰'; outSize.textContent = '۰'; dims.textContent = '—'; saved.textContent = '—'; vidLen.textContent = '—';
+  saveBtn.disabled = true; shareBtn.disabled = true; resetBtn.disabled = true;
+  setBar(0); hideNote();
+};
+resetState();
+
+fpsVal.textContent = fps.value;
+fps.addEventListener('input', () => fpsVal.textContent = fps.value);
+pickBtn.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('keydown', (e) => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); fileInput.click(); } });
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('hover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('hover'));
+dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('hover'); const file = e.dataTransfer.files && e.dataTransfer.files[0]; if (file) handleFile(file); });
+fileInput.addEventListener('change', (e) => { const file = e.target.files && e.target.files[0]; if (file) handleFile(file); });
+resetBtn.addEventListener('click', resetState);
+
+async function probeGIF(file){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file);
+    const img = document.createElement('img');
+    img.onload = async () => {
+      // Duration estimation via video element (more reliable)
+      const v = document.createElement('video');
+      v.preload='metadata'; v.muted=true;
+      v.onloadedmetadata = () => {
+        const d = isFinite(v.duration) ? v.duration : 0;
+        URL.revokeObjectURL(url); res({ w: img.naturalWidth||0, h: img.naturalHeight||0, d });
+      };
+      v.onerror = () => { URL.revokeObjectURL(url); res({ w: img.naturalWidth||0, h: img.naturalHeight||0, d: 0 }); };
+      v.src = url;
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('خواندن GIF ممکن نشد.')); };
+    img.src = url;
+  });
+}
+
+async function ensureFFmpeg(){
+  if (!ffmpeg.isLoaded()){
+    setBar(5);
+    showNote('در حال بارگذاری موتور تبدیل…', 'warn');
+    ffmpeg.setProgress(({ ratio }) => setBar(Math.round(ratio*80)));
+    await ffmpeg.load();
+    hideNote();
+  }
+}
+
+async function handleFile(file){
+  resetState();
+  originalFile = file;
+  inSize.textContent = fmtBytes(file.size);
+  const base = (file.name || 'gif').replace(/\.[^.]+$/, '');
+  const ext = (outFormat.value === 'webm') ? '.webm' : '.mp4';
+  outputName = base + ext;
+
+  try{
+    const meta = await probeGIF(file);
+    gifW = meta.w; gifH = meta.h; gifDur = meta.d || 0;
+    dims.textContent = (gifW && gifH) ? (gifW + '×' + gifH) : '—';
+    vidLen.textContent = gifDur ? toHHMMSS(gifDur) : '—';
+
+    await ensureFFmpeg();
+    setBar(10);
+
+    ffmpeg.FS('writeFile', 'in.gif', await fetchFile(file));
+
+    const fpsOut = parseInt(fps.value, 10) || 24;
+    const presetW = parseInt(presetWidth.value || '0', 10);
+    const customW = parseInt(customWidth.value || '0', 10);
+    const targetW = customW > 0 ? customW : (presetW > 0 ? presetW : 0);
+    const startSec = parseTime(startTime.value || '00:00:00');
+    const durSec = parseInt(duration.value || '0', 10);
+    const bg = hexToFF(bgColor.value || '#000000');
+
+    // Encoder/format
+    const isWebM = outFormat.value === 'webm';
+    const vcodec = isWebM ? 'libvpx-vp9' : 'mpeg4'; // mpeg4 is widely available in wasm builds
+    const extra = isWebM
+      ? (quality.value==='high' ? ['-b:v','0','-crf','28'] : quality.value==='medium' ? ['-b:v','0','-crf','34'] : ['-b:v','0','-crf','38'])
+      : (quality.value==='high' ? ['-qscale:v','2'] : quality.value==='medium' ? ['-qscale:v','4'] : ['-qscale:v','6']);
+
+    // Build filter graph
+    const scalePart = targetW > 0 ? `scale=${targetW}:-1:flags=lanczos` : 'scale=iw:ih';
+    const fpsPart = `fps=${fpsOut}`;
+    const w = targetW > 0 ? targetW : (gifW||0) || 0;
+    const h = targetW > 0 && gifW>0 && gifH>0 ? Math.max(1, Math.round((targetW/gifW)*gifH)) : (gifH||0);
+    const haveWH = w>0 && h>0;
+    const colorSrc = haveWH ? `color=c=${bg}:s=${w}x${h}${gifDur?`:d=${Math.ceil(durSec>0?durSec:gifDur)}`:''}` : null;
+
+    // Prefer filter_complex with background (handles alpha)
+    const args = [];
+    if (startSec > 0) args.push('-ss', String(startSec));
+    if (durSec > 0) args.push('-t', String(durSec));
+    args.push('-r', String(fpsOut));
+    args.push('-i', 'in.gif');
+
+    let usedComplex = false;
+    if (colorSrc){
+      args.push('-filter_complex',
+        `[0:v]${fpsPart},${scalePart},format=rgba[fg];`+
+        `${colorSrc}[bg];`+
+        `[bg][fg]overlay=shortest=1:format=auto,format=yuv420p[v]`
+      );
+      args.push('-map','[v]');
+      usedComplex = true;
+    } else {
+      args.push('-vf', `${fpsPart},${scalePart},format=yuv420p`);
+    }
+
+    if (isWebM){
+      args.push('-c:v', vcodec, ...extra, '-pix_fmt','yuv420p', '-f','webm', 'out.webm');
+    } else {
+      args.push('-c:v', vcodec, ...extra, '-movflags','+faststart', '-pix_fmt','yuv420p', '-f','mp4', 'out.mp4');
+    }
+
+    showNote('در حال تبدیل… لطفاً صبر کنید.', 'warn');
+    await ffmpeg.run(...args);
+
+    const outName = isWebM ? 'out.webm' : 'out.mp4';
+    const data = ffmpeg.FS('readFile', outName);
+    outputBlob = new Blob([data.buffer], { type: isWebM ? 'video/webm' : 'video/mp4' });
+    if (outputURL) URL.revokeObjectURL(outputURL);
+    outputURL = URL.createObjectURL(outputBlob);
+
+    preview.src = outputURL;
+    preview.onloadedmetadata = () => { placeholder.style.display = 'none'; };
+
+    if (haveWH) dims.textContent = w + '×' + h;
+    outSize.textContent = fmtBytes(outputBlob.size);
+    const gain = originalFile.size > 0 ? Math.max(0, 100 - Math.round((outputBlob.size / originalFile.size) * 100)) : 0;
+    saved.textContent = gain + '٪';
+
+    saveBtn.disabled = false; shareBtn.disabled = false; resetBtn.disabled = false;
+    hideNote(); setBar(100);
+
+    try{ ffmpeg.FS('unlink','in.gif'); ffmpeg.FS('unlink', outName); }catch{}
+
+  } catch (err){
+    console.error(err);
+    // Fallback simple pipeline (no bg composite)
+    try{
+      setBar(20);
+      const fpsOut = parseInt(fps.value, 10) || 24;
+      const presetW = parseInt(presetWidth.value || '0', 10);
+      const customW = parseInt(customWidth.value || '0', 10);
+      const targetW = customW > 0 ? customW : (presetW > 0 ? presetW : 0);
+
+      const args2 = ['-i','in.gif','-r', String(fpsOut)];
+      if (targetW > 0) args2.push('-vf', `scale=${targetW}:-1:flags=lanczos,format=yuv420p`);
+      else args2.push('-vf','format=yuv420p');
+
+      const isWebM = outFormat.value === 'webm';
+      const vcodec = isWebM ? 'libvpx-vp9' : 'mpeg4';
+      const extra = isWebM ? ['-b:v','0','-crf','34'] : ['-qscale:v','4'];
+
+      if (isWebM) args2.push('-c:v', vcodec, ...extra, '-f','webm','out.webm');
+      else args2.push('-c:v', vcodec, ...extra, '-movflags','+faststart','-f','mp4','out.mp4');
+
+      await ffmpeg.run(...args2);
+      const outName = isWebM ? 'out.webm' : 'out.mp4';
+      const data = ffmpeg.FS('readFile', outName);
+      outputBlob = new Blob([data.buffer], { type: isWebM ? 'video/webm' : 'video/mp4' });
+      if (outputURL) URL.revokeObjectURL(outputURL);
+      outputURL = URL.createObjectURL(outputBlob);
+      preview.src = outputURL;
+      placeholder.style.display = 'none';
+      outSize.textContent = fmtBytes(outputBlob.size);
+      saveBtn.disabled = false; shareBtn.disabled = false; resetBtn.disabled = false;
+      hideNote(); setBar(100);
+      try{ ffmpeg.FS('unlink','in.gif'); ffmpeg.FS('unlink', outName); }catch{}
+    }catch(e2){
+      console.error(e2);
+      showNote('تبدیل ناموفق بود.', 'err');
+      setBar(0);
+    }
+  }
+}
+
+saveBtn.addEventListener('click', () => {
+  if (!outputBlob) return;
+  const a = document.createElement('a');
+  const isWebM = outFormat.value === 'webm';
+  a.href = outputURL; a.download = outputName || (isWebM ? 'output.webm' : 'output.mp4');
+  document.body.appendChild(a); a.click(); a.remove();
+});
+
+shareBtn.addEventListener('click', async () => {
+  if (!outputBlob) return;
+  try {
+    const isWebM = outFormat.value === 'webm';
+    const file = new File([outputBlob], outputName || (isWebM?'output.webm':'output.mp4'), { type: isWebM ? 'video/webm' : 'video/mp4' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ title:'ویدیو خروجی', files:[file] });
+    } else if (navigator.share) {
+      await navigator.share({ title:'ویدیو خروجی', text:'فایل آماده اشتراک است.' });
+      showNote('برای اشتراک مستقیم فایل، مرورگری با Web Share سطح فایل نیاز است.', 'warn');
+    } else {
+      showNote('این دستگاه از پنل اشتراک‌گذاری پشتیبانی نمی‌کند.', 'warn');
+    }
+  } catch (err) {
+    if (err && err.name === 'AbortError') return;
+    showNote('اشتراک‌گذاری ناموفق بود.', 'err');
+  }
+});
+</script>
+</body>
+</html>
