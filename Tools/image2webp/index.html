@@ -7,7 +7,7 @@
   <title>SGT Market — مبدل استیکر (برنامک ایتا)</title>
   <link rel="icon" href="/icon.png" type="image/png" />
 
-  <!-- فونت فارسی خوانا و سبک -->
+  <!-- فونت فارسی سبک و خوانا -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
 
   <!-- SDK جاوااسکریپت برنامک‌های ایتا -->
@@ -202,6 +202,7 @@
   </div>
 
   <script type="module">
+    /* عناصر */
     const fileInput = document.getElementById('fileInput');
     const dropZone = document.getElementById('dropZone');
     const pickBtn = document.getElementById('pickBtn');
@@ -226,12 +227,14 @@
     const presetSize = document.getElementById('presetSize');
     const squareFit = document.getElementById('squareFit');
 
+    /* وضعیت */
     let originalFile = null;
     let outputBlob = null;
     let outputURL = null;
     let outputName = null;
     let imgWidth = 0, imgHeight = 0;
 
+    /* ابزار */
     const fmtBytes = (b) => {
       if (!b && b !== 0) return '—';
       const u = ['B','KB','MB','GB'];
@@ -243,18 +246,19 @@
     const showNote = (msg, type='warn') => { note.textContent = msg; note.className = 'alert ' + type; note.style.display = 'block'; };
     const hideNote = () => { note.style.display = 'none'; };
 
+    /* SDK ایتا */
     const EA = (window.Eitaa && window.Eitaa.WebApp) ? window.Eitaa.WebApp : null;
 
     function applyEitaaEnvironment(){
       if (!EA) return;
       try{
-        // آماده‌سازی SDK
         EA.ready?.();
 
-        // فول‌اسکرین خودکار برنامک
-        EA.enableFullscreen?.(true);
+        // درخواست تمام‌صفحه برنامک ایتا
+        // برخی کلاینت‌ها نیاز به تعامل کاربر دارند؛ تلاش اولیه اینجاست و در اولین کلیک هم دوباره درخواست می‌کنیم.
+        EA.requestFullscreen?.();
 
-        // تم و رنگ‌ها
+        // رنگ‌ها و محیط
         EA.setHeaderColor?.('secondary');
         EA.setBackgroundColor?.('bg_color');
 
@@ -263,29 +267,27 @@
         tp.text_color && document.documentElement.style.setProperty('--text', tp.text_color);
         tp.hint_color && document.documentElement.style.setProperty('--muted', tp.hint_color);
 
-        // safe-area و ارتفاع پایدار
         const ins = EA.safeAreaInset || {};
         (ins.top != null) && document.documentElement.style.setProperty('--safe-top', ins.top + 'px');
         (ins.bottom != null) && document.documentElement.style.setProperty('--safe-bottom', ins.bottom + 'px');
+
         const vh = EA.viewportStableHeight || EA.viewportHeight || window.innerHeight;
         document.documentElement.style.setProperty('--vh', vh + 'px');
 
-        EA.onEvent?.('themeChanged', applyEitaaEnvironment);
         EA.onEvent?.('viewportChanged', () => {
           const vh2 = EA.viewportStableHeight || EA.viewportHeight || window.innerHeight;
           document.documentElement.style.setProperty('--vh', vh2 + 'px');
         });
 
-        // دکمه اصلی: ذخیره
+        // MainButton برای ذخیره
         EA.MainButton?.setParams?.({ text:'ذخیره', color:'#d90429', text_color:'#ffffff' });
         EA.MainButton?.hide?.();
         EA.onEvent?.('mainButtonClicked', () => saveBtn.click());
 
-        // دکمه برگشت برای خروج
+        // بک برای خروج
         EA.BackButton?.show?.();
         EA.onEvent?.('backButtonClicked', () => EA.close?.());
-
-      } catch(e){ /* بی‌صدا */ }
+      } catch(e){}
     }
 
     function resetState(){
@@ -302,6 +304,13 @@
 
     qVal.textContent = quality.value;
     quality.addEventListener('input', () => qVal.textContent = quality.value);
+
+    // تعامل کاربر: اولین کلیک، اگر تمام‌صفحه فعال نشده بود، درخواست بده
+    function ensureFullscreenOnGesture(){
+      try { EA?.requestFullscreen?.(); } catch(e){}
+      document.removeEventListener('click', ensureFullscreenOnGesture, { once:true });
+    }
+    document.addEventListener('click', ensureFullscreenOnGesture, { once:true });
 
     pickBtn.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('click', () => fileInput.click());
@@ -330,19 +339,20 @@
 
       try{
         setBar(10);
-        const objectURL = URL.createObjectURL(file);
-        let bitmap = null;
-        try{ bitmap = await createImageBitmap(file); }
-        catch{
-          bitmap = await new Promise((res, rej) => {
-            const img = new Image();
-            img.onload = () => res(img);
-            img.onerror = () => rej(new Error('فرمت پشتیبانی نمی‌شود.'));
-            img.src = objectURL;
-          });
-        }
 
-        imgWidth = bitmap.width; imgHeight = bitmap.height;
+        // به‌جای createImageBitmap در WebView، از Image استفاده می‌کنیم تا سازگار باشد
+        const objectURL = URL.createObjectURL(file);
+        const img = new Image();
+        const imgLoaded = new Promise((res, rej) => {
+          img.onload = res;
+          img.onerror = () => rej(new Error('عدم توانایی در بارگذاری تصویر (فرمت یا داده نامعتبر)'));
+        });
+        img.src = objectURL;
+        await imgLoaded;
+
+        imgWidth = img.naturalWidth || img.width;
+        imgHeight = img.naturalHeight || img.height;
+        if (!imgWidth || !imgHeight) throw new Error('ابعاد تصویر قابل تشخیص نیست');
 
         const preset = parseInt(presetSize.value || '0', 10);
         const maxWNum = parseInt(maxWidth.value || '0', 10);
@@ -392,26 +402,22 @@
           drawY = Math.floor((canvasH - drawH) / 2);
         }
 
-        ctx.drawImage(bitmap, drawX, drawY, drawW, drawH);
-        if ('close' in bitmap) bitmap.close?.();
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
         setBar(60);
 
+        // خروجی
         const type = outFormat.value === 'png' ? 'image/png' : 'image/webp';
-        if (type === 'image/webp'){
-          const supportsWebP = (() => {
-            try { const c = document.createElement('canvas'); return c.toDataURL('image/webp').startsWith('data:image/webp'); }
-            catch { return false; }
-          })();
-          if (!supportsWebP) {
-            showNote('مرورگر شما خروجی WebP را پشتیبانی نمی‌کند.', 'err');
-            setBar(0);
-            return;
-          }
-        }
+        // اگر WebP در محیط پشتیبانی نشود، به PNG برگرد
+        const supportsWebP = (() => {
+          try { const c = document.createElement('canvas'); return c.toDataURL('image/webp').startsWith('data:image/webp'); }
+          catch { return false; }
+        })();
+        const finalType = (type === 'image/webp' && !supportsWebP) ? 'image/png' : type;
+
         const q = Math.max(0.6, Math.min(1, (parseInt(quality.value, 10) || 92) / 100));
         const blob = await new Promise((res, rej) => {
-          if (type === 'image/png'){
+          if (finalType === 'image/png'){
             canvas.toBlob(b => b ? res(b) : rej(new Error('تبدیل ناموفق')), 'image/png');
           } else {
             canvas.toBlob(b => b ? res(b) : rej(new Error('تبدیل ناموفق')), 'image/webp', q);
@@ -435,8 +441,9 @@
 
         EA?.MainButton?.show?.();
 
-      } catch {
-        showNote('خطا در تبدیل تصویر.', 'err');
+        URL.revokeObjectURL(objectURL);
+      } catch (err) {
+        showNote('خطا در تبدیل تصویر: ' + err.message, 'err');
         setBar(0);
       }
     }
