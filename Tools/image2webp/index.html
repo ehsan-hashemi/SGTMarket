@@ -29,10 +29,20 @@
     body{background:var(--bg);color:var(--text);line-height:1.65}
 
     .appbar{
-      position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:calc(10px + var(--safe-top)) 12px 10px;background:linear-gradient(90deg,var(--red2),var(--red3));color:#fff;
-      box-shadow:0 8px 18px rgba(217,4,41,0.25)
-    }
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:calc(10px + var(--safe-top)) 12px 10px;
+  background:linear-gradient(90deg,var(--red2),var(--red3));
+  color:#fff;
+  box-shadow:0 8px 18px rgba(217,4,41,0.25);
+  margin-top:30px; /* فاصله از بالای صفحه */
+}
+
     .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
     .brand img{width:34px;height:34px;border-radius:12px;box-shadow:0 0 0 2px rgba(255,255,255,0.18)}
     .brand .title{font-weight:900;letter-spacing:-0.2px}
