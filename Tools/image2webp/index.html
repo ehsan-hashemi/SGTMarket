@@ -7,78 +7,79 @@
 <title>SGT Market — مبدل استیکر</title>
 <link rel="icon" href="/icon.png" type="image/png" />
 <style>
-@font-face{
-  font-family:'Vazir';
-  src:url('/Vazir-Regular.ttf') format('truetype');
-  font-weight:400;font-style:normal;font-display:swap;
-}
+/* ===== Ultra-optimized, UI-safe, Eitaa-friendly styles ===== */
+@font-face{font-family:'Vazir';src:url('/Vazir-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Vazir",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{background:#f7f8fa;color:#0f172a;line-height:1.65}
+body{background:var(--bg);color:var(--text);line-height:1.65}
 :root{
   --red1:#ef233c;--red2:#d90429;--red3:#9b001c;
-  --text:#0f172a;--muted:#6b7280;--bg:#f7f8fa;--surface:#ffffff;
-  --border:#e5e7eb;--radius:18px;--shadow:0 10px 30px rgba(16,24,40,0.08);--accent:#ef233c;
+  --text:#0f172a;--muted:#6b7280;--bg:#f7f8fa;--surface:#ffffff;--border:#e5e7eb;
+  --radius:16px;--shadow:0 8px 20px rgba(16,24,40,0.06);--accent:#ef233c;
+  --safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom);--vh:100vh;
+}
+@media (prefers-color-scheme: dark){
+  :root{--text:#f8fafc;--muted:#cbd5e1;--bg:#0b1020;--surface:#0f172a;--border:#1f2937;--shadow:none}
 }
 .appbar{
   position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:12px 16px;background:linear-gradient(90deg,var(--red2),var(--red3));color:#fff;box-shadow:0 8px 24px rgba(217,4,41,0.28);
+  padding:calc(8px + var(--safe-top)) 16px 8px;background:linear-gradient(90deg,var(--red2),var(--red3));color:#fff;
+  box-shadow:0 8px 18px rgba(217,4,41,0.25);contain:content
 }
 .brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
-.brand img{width:40px;height:40px;border-radius:12px;box-shadow:0 0 0 2px rgba(255,255,255,0.2)}
+.brand img{width:36px;height:36px;border-radius:12px;box-shadow:0 0 0 2px rgba(255,255,255,0.18)}
 .brand .title{font-weight:900;letter-spacing:-0.2px}
 .brand .subtitle{font-size:0.9rem;color:rgba(255,255,255,0.85)}
-.container{max-width:1100px;margin:20px auto;padding:0 16px}
+.container{max-width:1000px;margin:16px auto;padding:0 12px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.grid{display:grid;gap:16px;grid-template-columns:1fr}
-@media (min-width:980px){.grid{grid-template-columns:1.1fr 0.9fr}}
+.grid{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:940px){.grid{grid-template-columns:1.05fr 0.95fr}}
 .zone{
-  border:2px dashed rgba(0,0,0,0.25);border-radius:calc(var(--radius) - 6px);padding:20px;min-height:180px;
+  border:2px dashed rgba(0,0,0,0.22);border-radius:calc(var(--radius) - 6px);padding:18px;min-height:160px;
   background:linear-gradient(180deg,#fafafa,#f9fafb);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;cursor:pointer;transition:0.2s ease;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;cursor:pointer;transition:border-color .15s ease,background .15s ease
 }
 .zone:hover,.zone.hover{border-color:var(--red1);background:rgba(239,35,60,0.06)}
 .zone .big{
-  font-weight:900;letter-spacing:-0.2px;font-size:1.05rem;background:linear-gradient(45deg,var(--red1),var(--red2));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:900;letter-spacing:-0.2px;font-size:1.02rem;background:linear-gradient(45deg,var(--red1),var(--red2));
+  -webkit-background-clip:text;background-clip:text;color:transparent
 }
-.zone .hint{color:var(--muted);font-size:0.92rem}
-.preview{display:grid;gap:12px;padding:16px;border-top:1px dashed var(--border)}
-@media (min-width:980px){.preview{border-top:none;border-right:1px dashed var(--border)}}
+.zone .hint{color:var(--muted);font-size:0.9rem}
+.preview{display:grid;gap:10px;padding:12px;border-top:1px dashed var(--border)}
+@media (min-width:940px){.preview{border-top:none;border-right:1px dashed var(--border)}}
 .img-wrap{
-  position:relative;width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#f0f2f5;display:grid;place-items:center;border:1px solid var(--border)
+  position:relative;width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#eef1f5;display:grid;place-items:center;border:1px solid var(--border);
+  content-visibility:auto;contain:paint
 }
 .img-wrap img{max-width:100%;max-height:100%;object-fit:contain;image-rendering:auto}
 .placeholder{position:absolute;color:#9aa3af;text-align:center}
-.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .btn{
-  appearance:none;border:1px solid transparent;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;transition:0.15s ease;box-shadow:var(--shadow)
+  appearance:none;border:1px solid transparent;border-radius:12px;padding:9px 13px;font-weight:800;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;box-shadow:var(--shadow)
 }
 .btn.primary{background:linear-gradient(180deg,var(--red1),var(--red2));color:#fff}
 .btn.secondary{background:#fff;border:1px solid var(--border);color:var(--text)}
 .btn.ghost{background:transparent;border:1px solid rgba(239,35,60,0.35);color:var(--red1)}
 .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0) scale(0.99)}
-.btn:disabled{opacity:0.6;cursor:not-allowed}
-.meta{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
-.chip{background:rgba(239,35,60,0.08);border:1px solid rgba(239,35,60,0.35);color:#7f1d1d;border-radius:999px;padding:6px 10px;font-size:0.9rem;text-align:center}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
-.stat{font-size:0.92rem;color:var(--muted)} .value{font-weight:900;color:var(--text)}
-details{background:#fafafa;border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.meta{display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.chip{background:rgba(239,35,60,0.08);border:1px solid rgba(239,35,60,0.35);color:#7f1d1d;border-radius:999px;padding:6px 10px;font-size:0.88rem;text-align:center}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0}
+.stat{font-size:0.9rem;color:var(--muted)} .value{font-weight:900;color:var(--text)}
+details{background:#fafafa;border:1px solid var(--border);border-radius:12px;padding:10px}
 summary{cursor:pointer;font-weight:900}
 .slider{width:160px}
-input[type="number"], select{
-  width:140px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)
-}
+input[type="number"], select{width:140px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
 .switch{display:flex;align-items:center;gap:8px}
-.progress{height:6px;background:#eef2f7;border-radius:999px;overflow:hidden}
-.bar{width:0%;height:100%;background:linear-gradient(90deg,var(--red1),var(--red2));transition:width 0.3s ease}
-.alert{border:1px dashed var(--border);border-radius:12px;padding:10px 12px;font-size:0.92rem;background:#fff;color:var(--text)}
+.progress{height:6px;background:#e7ecf2;border-radius:999px;overflow:hidden}
+.bar{width:0%;height:100%;background:linear-gradient(90deg,var(--red1),var(--red2));transition:width .25s ease}
+.alert{border:1px dashed var(--border);border-radius:12px;padding:10px;font-size:0.9rem;background:#fff;color:var(--text)}
 .alert.ok{border-color:rgba(46,204,113,0.5);background:#f0fdf4;color:#065f46}
 .alert.warn{border-color:rgba(255,183,3,0.45);background:#fffbeb;color:#92400e}
 .alert.err{border-color:rgba(255,77,79,0.5);background:#fef2f2;color:#991b1b}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:10px}
-footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
+footer{margin-top:10px;color:var(--muted);font-size:0.9rem;text-align:center;padding-bottom:calc(8px + var(--safe-bottom))}
 </style>
 </head>
 <body>
@@ -94,24 +95,26 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
   <div class="controls">
     <button id="pickBtn" class="btn primary">انتخاب عکس</button>
     <button id="cameraBtn" class="btn ghost">دوربین</button>
+    <button id="fullscreenBtn" class="btn secondary">فول‌اسکرین</button>
+    <button id="qrBtn" class="btn ghost">اسکن QR</button>
   </div>
 </header>
 
 <div class="container">
   <div class="card">
     <div class="grid">
-      <section style="padding:16px;">
+      <section style="padding:12px;">
         <div id="dropZone" class="zone" tabindex="0" role="button" aria-label="فایل را بکشید و رها کنید یا برای انتخاب کلیک کنید">
           <div class="big">بکش و رها کن یا کلیک کن</div>
           <div class="hint">PNG, JPG, GIF, SVG و …</div>
           <input id="fileInput" class="sr-only" type="file" accept="image/*" />
         </div>
 
-        <div style="height:12px"></div>
+        <div style="height:10px"></div>
 
         <details>
           <summary>تنظیمات پیشرفته</summary>
-          <div class="row" style="margin-top:8px">
+          <div class="row" style="margin-top:6px">
             <div class="stat">کیفیت WebP</div>
             <input id="quality" class="slider" type="range" min="60" max="100" value="92" />
             <div><span id="qVal" class="value">92</span></div>
@@ -147,10 +150,9 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
           </div>
         </details>
 
-        <div style="height:12px"></div>
-
+        <div style="height:10px"></div>
         <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
-        <div id="note" class="alert warn" style="display:none;margin-top:12px"></div>
+        <div id="note" class="alert warn" style="display:none;margin-top:10px"></div>
       </section>
 
       <aside class="preview">
@@ -170,9 +172,26 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
           <div class="controls">
             <button id="saveBtn" class="btn secondary" disabled>ذخیره</button>
             <button id="shareBtn" class="btn secondary" disabled>اشتراک‌گذاری</button>
+            <button id="openLinkBtn" class="btn ghost">بازکردن لینک</button>
           </div>
           <button id="resetBtn" class="btn ghost" disabled>بازنشانی</button>
         </div>
+
+        <details>
+          <summary>قابلیت‌های دستگاه و بازخورد</summary>
+          <div class="row">
+            <div class="controls">
+              <button id="hapticBtn" class="btn ghost">لرزش لمسی</button>
+              <button id="accelBtn" class="btn ghost">شتاب‌سنج</button>
+              <button id="gyroBtn" class="btn ghost">ژیروسکوپ</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="stat">داده حسگر:</div>
+            <div id="sensorData" class="value">—</div>
+          </div>
+        </details>
+
       </aside>
     </div>
   </div>
@@ -181,10 +200,13 @@ footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:center}
 </div>
 
 <script type="module">
+/* ===== Base elements ===== */
 const fileInput = document.getElementById('fileInput');
 const dropZone = document.getElementById('dropZone');
 const pickBtn = document.getElementById('pickBtn');
 const cameraBtn = document.getElementById('cameraBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const qrBtn = document.getElementById('qrBtn');
 
 const preview = document.getElementById('preview');
 const placeholder = document.getElementById('placeholder');
@@ -197,6 +219,7 @@ const bar = document.getElementById('bar');
 const saveBtn = document.getElementById('saveBtn');
 const shareBtn = document.getElementById('shareBtn');
 const resetBtn = document.getElementById('resetBtn');
+const openLinkBtn = document.getElementById('openLinkBtn');
 
 const note = document.getElementById('note');
 const quality = document.getElementById('quality');
@@ -207,12 +230,18 @@ const outFormat = document.getElementById('outFormat');
 const presetSize = document.getElementById('presetSize');
 const squareFit = document.getElementById('squareFit');
 
+const hapticBtn = document.getElementById('hapticBtn');
+const accelBtn = document.getElementById('accelBtn');
+const gyroBtn = document.getElementById('gyroBtn');
+const sensorData = document.getElementById('sensorData');
+
 let originalFile = null;
 let outputBlob = null;
 let outputURL = null;
 let outputName = null;
 let imgWidth = 0, imgHeight = 0;
 
+/* ===== Utils ===== */
 const fmtBytes = (b) => {
   if (!b && b !== 0) return '—';
   const u = ['B','KB','MB','GB'];
@@ -223,7 +252,173 @@ const fmtBytes = (b) => {
 const setBar = (p) => { bar.style.width = Math.max(0, Math.min(100, p)) + '%'; };
 const showNote = (msg, type='warn') => { note.textContent = msg; note.className = 'alert ' + type; note.style.display = 'block'; };
 const hideNote = () => { note.style.display = 'none'; };
+const supportsFS = () => !!(document.fullscreenEnabled);
 
+/* ===== Eitaa SDK helpers (guarded) ===== */
+const EA = (window.Eitaa && window.Eitaa.WebApp) ? window.Eitaa.WebApp : null;
+
+function eReady(){
+  if (!EA) return;
+  try {
+    EA.ready?.();
+    // Color scheme and theme params to CSS variables
+    const cs = EA.colorScheme || 'light';
+    const tp = EA.themeParams || {};
+    if (tp.bg_color) document.documentElement.style.setProperty('--bg', tp.bg_color);
+    if (tp.text_color) document.documentElement.style.setProperty('--text', tp.text_color);
+    if (tp.hint_color) document.documentElement.style.setProperty('--muted', tp.hint_color);
+    if (tp.button_color) document.documentElement.style.setProperty('--red2', tp.button_color);
+    if (tp.button_text_color) document.documentElement.style.setProperty('--surface', tp.button_text_color); // optional mapping
+    // Safe area insets to CSS vars
+    if (EA.safeAreaInset) {
+      document.documentElement.style.setProperty('--safe-top', EA.safeAreaInset.top + 'px');
+      document.documentElement.style.setProperty('--safe-bottom', EA.safeAreaInset.bottom + 'px');
+    }
+    // Viewport stable height -> CSS var for VH fixes
+    const vh = (EA.viewportStableHeight || EA.viewportHeight || window.innerHeight);
+    document.documentElement.style.setProperty('--vh', vh + 'px');
+
+    // UI bars / settings
+    EA.setHeaderColor?.('secondary');
+    EA.setBackgroundColor?.('bg_color');
+    EA.enableClosingConfirmation?.(true);
+
+    // MainButton / SecondaryButton setup
+    EA.MainButton?.setParams?.({text:'ذخیره/اشتراک', color: '#d90429', text_color:'#ffffff'});
+    EA.MainButton?.show?.();
+    EA.onEvent?.('mainButtonClicked', async () => {
+      await showActionSheet();
+    });
+
+    EA.SecondaryButton?.setParams?.({text:'بازنشانی'});
+    EA.SecondaryButton?.show?.();
+    EA.onEvent?.('secondaryButtonClicked', () => resetState());
+
+    // Back button behavior
+    EA.BackButton?.show?.();
+    EA.onEvent?.('backButtonClicked', () => {
+      if (outputBlob) {
+        // Confirm reset or close
+        EA.showConfirm?.('خروج یا بازنشانی؟', (ok) => {
+          if (ok){ resetState(); } else { EA.close?.(); }
+        }) || resetState();
+      } else {
+        EA.close?.();
+      }
+    });
+
+    // Settings button
+    EA.SettingsButton?.show?.();
+    EA.onEvent?.('settingsButtonClicked', () => {
+      EA.showAlert?.('این اپ تنظیمات داخلی ندارد. از تنظیمات ایتا استفاده کنید.');
+    });
+
+    // Theme/viewport updates
+    EA.onEvent?.('themeChanged', () => {
+      const tp2 = EA.themeParams || {};
+      if (tp2.bg_color) document.documentElement.style.setProperty('--bg', tp2.bg_color);
+      if (tp2.text_color) document.documentElement.style.setProperty('--text', tp2.text_color);
+    });
+    EA.onEvent?.('viewportChanged', (st) => {
+      const vh2 = (EA.viewportStableHeight || EA.viewportHeight || window.innerHeight);
+      document.documentElement.style.setProperty('--vh', vh2 + 'px');
+    });
+
+    // Haptic light feedback to show readiness
+    EA.HapticFeedback?.impactOccurred?.('light');
+  } catch (e){ /* swallow */ }
+}
+
+async function showActionSheet(){
+  // Use Eitaa popup if available; fallback to native confirm
+  if (EA?.showPopup) {
+    EA.showPopup({
+      title: 'اقدام خروجی',
+      message: 'ذخیره یا اشتراک‌گذاری فایل خروجی را انتخاب کنید.',
+      buttons: [
+        {id:'save', type:'default', text:'ذخیره'},
+        {id:'share', type:'default', text:'اشتراک‌گذاری'},
+        {id:'cancel', type:'cancel', text:'لغو'}
+      ]
+    }, (btnId) => {
+      if (btnId === 'save') saveBtn.click();
+      else if (btnId === 'share') shareBtn.click();
+    });
+  } else {
+    const ok = confirm('ذخیره؟ لغو برای اشتراک‌گذاری');
+    if (ok) saveBtn.click(); else shareBtn.click();
+  }
+}
+
+/* Fullscreen (Eitaa + browser guard) */
+function enterFullscreen(){
+  if (EA?.enableFullscreen) { EA.enableFullscreen(true); return; }
+  if (EA?.expand) { EA.expand(); } // expand-like
+  if (supportsFS()) { document.documentElement.requestFullscreen().catch(()=>{}); }
+}
+function exitFullscreen(){
+  if (EA?.enableFullscreen) { EA.enableFullscreen(false); return; }
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+}
+
+/* QR scanner popup */
+function openQr(){
+  if (EA?.showScanQrPopup) {
+    EA.showScanQrPopup?.({ text:'کد را اسکن کنید' });
+  } else {
+    showNote('QR در این محیط در دسترس نیست.', 'warn');
+  }
+}
+
+/* Device sensors */
+let accelOn = false, gyroOn = false;
+function toggleAccel(){
+  if (!EA?.Accelerometer) { showNote('شتاب‌سنج پشتیبانی نمی‌شود.', 'warn'); return; }
+  accelOn = !accelOn;
+  if (accelOn){
+    EA.Accelerometer.start?.({ refresh_rate: 30 });
+    EA.onEvent?.('accelerometerChanged', (d) => {
+      sensorData.textContent = `accel: x=${d.x?.toFixed?.(2)} y=${d.y?.toFixed?.(2)} z=${d.z?.toFixed?.(2)}`;
+    });
+    EA.HapticFeedback?.selectionChanged?.();
+  } else {
+    EA.Accelerometer.stop?.();
+    sensorData.textContent = '—';
+  }
+}
+function toggleGyro(){
+  if (!EA?.Gyroscope) { showNote('ژیروسکوپ پشتیبانی نمی‌شود.', 'warn'); return; }
+  gyroOn = !gyroOn;
+  if (gyroOn){
+    EA.Gyroscope.start?.({ refresh_rate: 30 });
+    EA.onEvent?.('gyroscopeChanged', (d) => {
+      sensorData.textContent = `gyro: x=${d.x?.toFixed?.(2)} y=${d.y?.toFixed?.(2)} z=${d.z?.toFixed?.(2)}`;
+    });
+    EA.HapticFeedback?.selectionChanged?.();
+  } else {
+    EA.Gyroscope.stop?.();
+    sensorData.textContent = '—';
+  }
+}
+
+/* Write access + send message (if supported, guarded) */
+async function trySendMessage(text){
+  if (!EA) return false;
+  try {
+    const ok = await new Promise((resolve)=> {
+      EA.requestWriteAccess?.((granted)=> resolve(!!granted));
+    });
+    if (!ok) { showNote('دسترسی ارسال پیام اعطا نشد.', 'warn'); return false; }
+    if (EA.sendMessage){
+      EA.sendMessage(text);
+      EA.HapticFeedback?.notificationOccurred?.('success');
+      return true;
+    }
+    return false;
+  } catch { return false; }
+}
+
+/* ===== App state ===== */
 const resetState = () => {
   originalFile = null;
   if (outputURL) URL.revokeObjectURL(outputURL);
@@ -263,6 +458,35 @@ fileInput.addEventListener('change', (e) => {
 });
 resetBtn.addEventListener('click', resetState);
 
+fullscreenBtn.addEventListener('click', () => {
+  if (document.fullscreenElement || EA?.isFullscreen) exitFullscreen();
+  else enterFullscreen();
+});
+qrBtn.addEventListener('click', () => openQr());
+
+hapticBtn.addEventListener('click', () => {
+  EA?.HapticFeedback?.selectionChanged?.();
+  EA?.HapticFeedback?.impactOccurred?.('medium');
+});
+accelBtn.addEventListener('click', () => toggleAccel());
+gyroBtn.addEventListener('click', () => toggleGyro());
+
+openLinkBtn.addEventListener('click', () => {
+  const url = 'https://eitaa.com';
+  if (EA?.openLink) EA.openLink(url, { try_browser: true });
+  else window.open(url, '_blank', 'noopener');
+});
+
+if (EA){
+  EA.onEvent?.('qrTextReceived', (txt) => {
+    showNote('متن QR: ' + txt, 'ok');
+  });
+  EA.onEvent?.('scanQrPopupClosed', () => {
+    // optional
+  });
+}
+
+/* ===== Core image pipeline ===== */
 async function handleFile(file){
   resetState();
   originalFile = file;
@@ -352,7 +576,6 @@ async function handleFile(file){
         return;
       }
     }
-
     const q = Math.max(0.6, Math.min(1, (parseInt(quality.value, 10) || 92) / 100));
     const blob = await new Promise((res, rej) => {
       if (type === 'image/png'){
@@ -377,35 +600,71 @@ async function handleFile(file){
     setBar(100);
     saveBtn.disabled = false; shareBtn.disabled = false; resetBtn.disabled = false;
 
+    EA?.HapticFeedback?.notificationOccurred?.('success');
+    EA?.MainButton?.enable?.();
+
   } catch {
     showNote('خطا در تبدیل تصویر.', 'err');
     setBar(0);
+    EA?.HapticFeedback?.notificationOccurred?.('error');
   }
 }
 
-saveBtn.addEventListener('click', () => {
+/* Save (download) */
+saveBtn.addEventListener('click', async () => {
   if (!outputBlob) return;
   const a = document.createElement('a');
   a.href = outputURL; a.download = outputName || (outFormat.value==='png'?'image.png':'image.webp');
   document.body.appendChild(a); a.click(); a.remove();
+
+  // Try download via SDK if present
+  if (EA?.downloadFile){
+    EA.downloadFile(outputURL);
+  }
+  await trySendMessage('✅ فایل خروجی آماده شد: ' + (outputName || 'image'));
 });
 
+/* Share (Web Share + Eitaa openLink fallback) */
 shareBtn.addEventListener('click', async () => {
   if (!outputBlob) return;
   try {
     const file = new File([outputBlob], outputName || (outFormat.value==='png'?'image.png':'image.webp'), { type: outFormat.value==='png'?'image/png':'image/webp' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ title:'فایل خروجی', files:[file] });
+      EA?.HapticFeedback?.notificationOccurred?.('success');
     } else if (navigator.share) {
-      await navigator.share({ title:'لینک خروجی', text:'فایل آماده اشتراک است.' });
+      await navigator.share({ title:'فایل خروجی', text:'فایل آماده اشتراک است.' });
       showNote('برای اشتراک مستقیم فایل، مرورگری با Web Share سطح فایل نیاز است.', 'warn');
+    } else if (EA?.openLink) {
+      EA.openLink(outputURL, { try_browser: true });
+      showNote('فایل از طریق مرورگر باز شد.', 'ok');
     } else {
       showNote('این دستگاه از پنل اشتراک‌گذاری پشتیبانی نمی‌کند.', 'warn');
     }
   } catch (err) {
     if (err && err.name === 'AbortError') return;
     showNote('اشتراک‌گذاری ناموفق بود.', 'err');
+    EA?.HapticFeedback?.notificationOccurred?.('error');
   }
+});
+
+/* Init Eitaa SDK and events */
+document.addEventListener('DOMContentLoaded', () => {
+  eReady();
+
+  // Popup closed
+  EA?.onEvent?.('popupClosed', () => { /* no-op */ });
+
+  // QR
+  EA?.onEvent?.('qrTextReceived', (txt) => {
+    showNote('متن QR: ' + txt, 'ok');
+    EA?.HapticFeedback?.notificationOccurred?.('success');
+  });
+
+  // Fullscreen changes
+  EA?.onEvent?.('fullscreenChanged', (state) => {
+    // Optional: reflect state
+  });
 });
 </script>
 </body>
