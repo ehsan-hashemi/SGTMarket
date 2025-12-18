@@ -29,21 +29,11 @@
     body{background:var(--bg);color:var(--text);line-height:1.65}
 
     .appbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:calc(62px + var(--safe-top)) 12px 10px;
-  background:linear-gradient(90deg,var(--red2),var(--red3));
-  color:#fff;
-  box-shadow:0 8px 18px rgba(217,4,41,0.25);
-  margin-top:0px; /* فاصله از بالای صفحه */
-}
-
-
+      position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;gap:10px;
+      padding:calc(10px + var(--safe-top)) 12px 10px;
+      background:linear-gradient(90deg,var(--red2),var(--red3));color:#fff;
+      box-shadow:0 8px 18px rgba(217,4,41,0.25)
+    }
     .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
     .brand img{width:34px;height:34px;border-radius:12px;box-shadow:0 0 0 2px rgba(255,255,255,0.18)}
     .brand .title{font-weight:900;letter-spacing:-0.2px}
@@ -83,7 +73,7 @@
       transition:transform .12s ease,box-shadow .12s ease;box-shadow:var(--shadow)
     }
     .btn.primary{background:linear-gradient(180deg,var(--red1),var(--red2));color:#fff}
-    .btn.secondary{background:#fff;border:1px solid var(--border);color:var(--text)}
+    .btn.secondary{background:#fff;border:1px solid var(--border);color:#0f172a}
     .btn.ghost{background:transparent;border:1px solid rgba(239,35,60,0.35);color:var(--red1)}
     .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0) scale(0.99)}
     .btn:disabled{opacity:.6;cursor:not-allowed}
@@ -99,13 +89,13 @@
     summary{cursor:pointer;font-weight:900}
     .slider{width:160px}
 
-    input[type="number"], select{width:140px;padding:10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
+    input[type="number"], select{width:140px;padding:10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:#0f172a}
     .switch{display:flex;align-items:center;gap:8px}
 
     .progress{height:6px;background:#e7ecf2;border-radius:999px;overflow:hidden}
     .bar{width:0%;height:100%;background:linear-gradient(90deg,var(--red1),var(--red2));transition:width .25s ease}
 
-    .alert{border:1px dashed var(--border);border-radius:12px;padding:10px;font-size:0.9rem;background:#fff;color:var(--text)}
+    .alert{border:1px dashed var(--border);border-radius:12px;padding:10px;font-size:0.9rem;background:#fff;color:#0f172a}
     .alert.ok{border-color:rgba(46,204,113,0.5);background:#f0fdf4;color:#065f46}
     .alert.warn{border-color:rgba(255,183,3,0.45);background:#fffbeb;color:#92400e}
     .alert.err{border-color:rgba(255,77,79,0.5);background:#fef2f2;color:#991b1b}
@@ -126,9 +116,6 @@
         <div class="subtitle">مبدل استیکر</div>
       </div>
     </a>
-    <div class="controls">
-      <button id="pickBtn" class="btn primary">انتخاب عکس</button>
-    </div>
   </header>
 
   <div class="container">
@@ -216,7 +203,6 @@
     /* عناصر */
     const fileInput = document.getElementById('fileInput');
     const dropZone = document.getElementById('dropZone');
-    const pickBtn = document.getElementById('pickBtn');
 
     const preview = document.getElementById('preview');
     const placeholder = document.getElementById('placeholder');
@@ -264,12 +250,9 @@
       if (!EA) return;
       try{
         EA.ready?.();
-
-        // درخواست تمام‌صفحه برنامک ایتا
-        // برخی کلاینت‌ها نیاز به تعامل کاربر دارند؛ تلاش اولیه اینجاست و در اولین کلیک هم دوباره درخواست می‌کنیم.
+        // درخواست تمام‌صفحه؛ بعضی کلاینت‌ها نیاز به ژست کاربر دارند، پس یک بار دیگر هم در اولین کلیک درخواست می‌دهیم
         EA.requestFullscreen?.();
 
-        // رنگ‌ها و محیط
         EA.setHeaderColor?.('secondary');
         EA.setBackgroundColor?.('bg_color');
 
@@ -316,14 +299,13 @@
     qVal.textContent = quality.value;
     quality.addEventListener('input', () => qVal.textContent = quality.value);
 
-    // تعامل کاربر: اولین کلیک، اگر تمام‌صفحه فعال نشده بود، درخواست بده
+    // ژست کاربر برای فول‌اسکرین در اولین تعامل
     function ensureFullscreenOnGesture(){
       try { EA?.requestFullscreen?.(); } catch(e){}
       document.removeEventListener('click', ensureFullscreenOnGesture, { once:true });
     }
     document.addEventListener('click', ensureFullscreenOnGesture, { once:true });
 
-    pickBtn.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
@@ -340,6 +322,27 @@
       if (file) handleFile(file);
     });
 
+    // بارگذار سازگار: هم از URL.createObjectURL و هم FileReader استفاده می‌کنیم (Fallback برای WebViewها)
+    function loadImageFromFile(file){
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+          // تلاش دوم با FileReader (برخی WebViewها روی blob مشکل دارند)
+          const fr = new FileReader();
+          fr.onerror = () => reject(new Error('عدم توانایی در بارگذاری تصویر (فرمت یا داده نامعتبر)'));
+          fr.onload = () => {
+            const img2 = new Image();
+            img2.onload = () => resolve(img2);
+            img2.onerror = () => reject(new Error('عدم توانایی در بارگذاری تصویر (فرمت یا داده نامعتبر)'));
+            img2.src = fr.result;
+          };
+          fr.readAsDataURL(file);
+        };
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
     async function handleFile(file){
       resetState();
       originalFile = file;
@@ -351,15 +354,7 @@
       try{
         setBar(10);
 
-        // به‌جای createImageBitmap در WebView، از Image استفاده می‌کنیم تا سازگار باشد
-        const objectURL = URL.createObjectURL(file);
-        const img = new Image();
-        const imgLoaded = new Promise((res, rej) => {
-          img.onload = res;
-          img.onerror = () => rej(new Error('عدم توانایی در بارگذاری تصویر (فرمت یا داده نامعتبر)'));
-        });
-        img.src = objectURL;
-        await imgLoaded;
+        const img = await loadImageFromFile(file);
 
         imgWidth = img.naturalWidth || img.width;
         imgHeight = img.naturalHeight || img.height;
@@ -419,7 +414,6 @@
 
         // خروجی
         const type = outFormat.value === 'png' ? 'image/png' : 'image/webp';
-        // اگر WebP در محیط پشتیبانی نشود، به PNG برگرد
         const supportsWebP = (() => {
           try { const c = document.createElement('canvas'); return c.toDataURL('image/webp').startsWith('data:image/webp'); }
           catch { return false; }
@@ -449,25 +443,27 @@
 
         setBar(100);
         saveBtn.disabled = false; shareBtn.disabled = false;
-
         EA?.MainButton?.show?.();
-
-        URL.revokeObjectURL(objectURL);
       } catch (err) {
         showNote('خطا در تبدیل تصویر: ' + err.message, 'err');
         setBar(0);
       }
     }
 
+    // ذخیره — رفع مشکل کلیک: همیشه از Blob و anchor استفاده می‌کنیم
     saveBtn.addEventListener('click', () => {
-      if (!outputBlob) return;
+      if (!outputBlob) { showNote('ابتدا تصویر را تبدیل کنید.', 'warn'); return; }
       const a = document.createElement('a');
-      a.href = outputURL; a.download = outputName || (outFormat.value==='png'?'image.png':'image.webp');
-      document.body.appendChild(a); a.click(); a.remove();
+      a.href = outputURL;
+      a.download = outputName || (outFormat.value==='png'?'image.png':'image.webp');
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     });
 
+    // اشتراک‌گذاری — پوشش همه حالت‌ها + fallback بازکردن در مرورگر
     shareBtn.addEventListener('click', async () => {
-      if (!outputBlob) return;
+      if (!outputBlob) { showNote('ابتدا تصویر را تبدیل کنید.', 'warn'); return; }
       try {
         const file = new File([outputBlob], outputName || (outFormat.value==='png'?'image.png':'image.webp'), { type: outFormat.value==='png'?'image/png':'image/webp' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -487,6 +483,7 @@
       }
     });
 
+    // آماده‌سازی محیط ایتا و رویدادها
     document.addEventListener('DOMContentLoaded', applyEitaaEnvironment);
   </script>
 </body>
