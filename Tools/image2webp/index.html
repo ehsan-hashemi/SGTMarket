@@ -10,8 +10,8 @@
   <!-- فونت فارسی سبک و خوانا -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
 
-  <!-- SDK جاوااسکریپت برنامک‌های ایتا -->
-  <script src="https://developer.eitaa.com/eitaa-web-app.js"></script>
+  <!-- SDK جاوااسکریپت برنامک‌های ایتا (رسمی) -->
+  <script src="https://developer.eitaa.com/eitaa-web-app.js" defer></script>
 
   <style>
     :root{
@@ -30,7 +30,7 @@
 
     .appbar{
       position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;gap:10px;
-      padding:calc(15px + var(--safe-top)) 12px 10px;
+      padding:calc(10px + var(--safe-top)) 12px 10px;
       background:linear-gradient(90deg,var(--red2),var(--red3));color:#fff;
       box-shadow:0 8px 18px rgba(217,4,41,0.25)
     }
@@ -44,6 +44,8 @@
 
     .grid{display:grid;gap:12px;grid-template-columns:1fr}
     @media (min-width:940px){.grid{grid-template-columns:1.05fr 0.95fr}}
+
+    .section{padding:12px}
 
     .zone{
       border:2px dashed rgba(0,0,0,0.22);border-radius:calc(var(--radius) - 6px);padding:16px;min-height:150px;
@@ -72,9 +74,7 @@
       appearance:none;border:1px solid transparent;border-radius:12px;padding:12px 16px;min-height:48px;font-weight:800;cursor:pointer;
       transition:transform .12s ease,box-shadow .12s ease;box-shadow:var(--shadow)
     }
-    .btn.primary{background:linear-gradient(180deg,var(--red1),var(--red2));color:#fff}
     .btn.secondary{background:#fff;border:1px solid var(--border);color:#0f172a}
-    .btn.ghost{background:transparent;border:1px solid rgba(239,35,60,0.35);color:var(--red1)}
     .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0) scale(0.99)}
     .btn:disabled{opacity:.6;cursor:not-allowed}
 
@@ -95,7 +95,7 @@
     .progress{height:6px;background:#e7ecf2;border-radius:999px;overflow:hidden}
     .bar{width:0%;height:100%;background:linear-gradient(90deg,var(--red1),var(--red2));transition:width .25s ease}
 
-    .alert{border:1px dashed var(--border);border-radius:12px;padding:10px;font-size:0.9rem;background:#fff;color:#0f172a}
+    .alert{border:1px dashed var(--border);border-radius:12px;padding:10px;font-size:0.9rem;background:#fff;color:#0f172a;display:none}
     .alert.ok{border-color:rgba(46,204,113,0.5);background:#f0fdf4;color:#065f46}
     .alert.warn{border-color:rgba(255,183,3,0.45);background:#fffbeb;color:#92400e}
     .alert.err{border-color:rgba(255,77,79,0.5);background:#fef2f2;color:#991b1b}
@@ -121,7 +121,7 @@
   <div class="container">
     <div class="card">
       <div class="grid">
-        <section style="padding:12px;">
+        <section class="section">
           <div id="dropZone" class="zone" tabindex="0" role="button" aria-label="فایل را بکشید و رها کنید یا برای انتخاب کلیک کنید">
             <div class="big">بکش و رها کن یا کلیک کن</div>
             <div class="hint">PNG, JPG, GIF, SVG و …</div>
@@ -170,7 +170,7 @@
 
           <div style="height:10px"></div>
           <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
-          <div id="note" class="alert warn" style="display:none;margin-top:10px"></div>
+          <div id="note" class="alert warn" style="margin-top:10px"></div>
         </section>
 
         <aside class="preview">
@@ -188,7 +188,7 @@
 
           <div class="row">
             <div class="controls">
-              <button id="saveBtn" class="btn secondary" disabled>ذخیره</button>
+              <button id="saveBtn" class="btn secondary" disabled>دانلود</button>
               <button id="shareBtn" class="btn secondary" disabled>اشتراک‌گذاری</button>
             </div>
           </div>
@@ -227,7 +227,8 @@
     /* وضعیت */
     let originalFile = null;
     let outputBlob = null;
-    let outputURL = null;
+    let outputURL = null;     // blob: preview
+    let outputHttps = null;   // https: برای دانلود/اشتراک
     let outputName = null;
     let imgWidth = 0, imgHeight = 0;
 
@@ -250,11 +251,11 @@
       if (!EA) return;
       try{
         EA.ready?.();
-        // درخواست تمام‌صفحه؛ بعضی کلاینت‌ها نیاز به ژست کاربر دارند، پس یک بار دیگر هم در اولین کلیک درخواست می‌دهیم
         EA.requestFullscreen?.();
 
-        EA.setHeaderColor?.('secondary');
+        EA.setHeaderColor?.('bg_color');
         EA.setBackgroundColor?.('bg_color');
+        EA.setBottomBarColor?.('bottom_bar_bg_color');
 
         const tp = EA.themeParams || {};
         tp.bg_color && document.documentElement.style.setProperty('--bg', tp.bg_color);
@@ -273,12 +274,13 @@
           document.documentElement.style.setProperty('--vh', vh2 + 'px');
         });
 
-        // MainButton برای ذخیره
-        EA.MainButton?.setParams?.({ text:'ذخیره', color:'#d90429', text_color:'#ffffff' });
-        EA.MainButton?.hide?.();
-        EA.onEvent?.('mainButtonClicked', () => saveBtn.click());
+        // دکمه‌های پایین برنامک برای تعامل کاربر
+        EA.MainButton?.setParams?.({ text:'دانلود', is_active:true, is_visible:true });
+        EA.SecondaryButton?.setParams?.({ text:'اشتراک‌گذاری', is_active:true, is_visible:true, position:'right' });
 
-        // بک برای خروج
+        EA.onEvent?.('mainButtonClicked', () => saveBtn.click());
+        EA.onEvent?.('secondaryButtonClicked', () => shareBtn.click());
+
         EA.BackButton?.show?.();
         EA.onEvent?.('backButtonClicked', () => EA.close?.());
       } catch(e){}
@@ -287,11 +289,10 @@
     function resetState(){
       originalFile = null;
       if (outputURL) URL.revokeObjectURL(outputURL);
-      outputURL = null; outputBlob = null; outputName = null;
+      outputURL = null; outputBlob = null; outputHttps = null; outputName = null;
       preview.removeAttribute('src'); placeholder.style.display = 'block';
       inSize.textContent = '۰'; outSize.textContent = '۰'; dims.textContent = '—'; saved.textContent = '—';
       saveBtn.disabled = true; shareBtn.disabled = true;
-      EA?.MainButton?.hide?.();
       setBar(0); hideNote();
     }
     resetState();
@@ -299,12 +300,12 @@
     qVal.textContent = quality.value;
     quality.addEventListener('input', () => qVal.textContent = quality.value);
 
-    // ژست کاربر برای فول‌اسکرین در اولین تعامل
+    // فول‌اسکرین در اولین تعامل (کلاینت‌های سخت‌گیر)
     function ensureFullscreenOnGesture(){
       try { EA?.requestFullscreen?.(); } catch(e){}
-      document.removeEventListener('click', ensureFullscreenOnGesture, { once:true });
+      document.removeEventListener('pointerdown', ensureFullscreenOnGesture, { once:true });
     }
-    document.addEventListener('click', ensureFullscreenOnGesture, { once:true });
+    document.addEventListener('pointerdown', ensureFullscreenOnGesture, { once:true });
 
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('keydown', (e) => {
@@ -322,24 +323,48 @@
       if (file) handleFile(file);
     });
 
-    // بارگذار سازگار: هم از URL.createObjectURL و هم FileReader استفاده می‌کنیم (Fallback برای WebViewها)
-    function loadImageFromFile(file){
-      return new Promise((resolve, reject) => {
+    // بارگذار سازگار: createImageBitmap → Image(blob URL) → FileReader(data URL)
+    async function loadImageFromFile(file){
+      // جلوگیری از فرمت‌های دشوار (HEIC/HEIF) که معمولاً پشتیبانی نمی‌شوند
+      const name = (file.name || '').toLowerCase();
+      if (/\.(heic|heif|raw|cr2|nef|arw)$/.test(name)) {
+        throw new Error('این فرمت در مرورگر/وب‌ویو پشتیبانی نمی‌شود.');
+      }
+
+      if (window.createImageBitmap){
+        try {
+          const bitmap = await createImageBitmap(file);
+          const c = document.createElement('canvas');
+          c.width = bitmap.width; c.height = bitmap.height;
+          c.getContext('2d').drawImage(bitmap, 0, 0);
+          bitmap.close?.();
+          const img = new Image();
+          img.src = c.toDataURL('image/png');
+          await new Promise((resolve, reject)=>{ img.onload = resolve; img.onerror = ()=> reject(new Error('بارگذاری bitmap ناموفق')); });
+          return img;
+        } catch {}
+      }
+      try {
+        const url = URL.createObjectURL(file);
         const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => {
-          // تلاش دوم با FileReader (برخی WebViewها روی blob مشکل دارند)
-          const fr = new FileReader();
-          fr.onerror = () => reject(new Error('عدم توانایی در بارگذاری تصویر (فرمت یا داده نامعتبر)'));
-          fr.onload = () => {
-            const img2 = new Image();
-            img2.onload = () => resolve(img2);
-            img2.onerror = () => reject(new Error('عدم توانایی در بارگذاری تصویر (فرمت یا داده نامعتبر)'));
-            img2.src = fr.result;
-          };
-          fr.readAsDataURL(file);
+        const p = new Promise((res, rej) => {
+          img.onload = () => { URL.revokeObjectURL(url); res(); };
+          img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('بارگذاری blob ناموفق')); };
+        });
+        img.src = url;
+        await p;
+        return img;
+      } catch {}
+      return await new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onerror = () => reject(new Error('عدم توانایی در بارگذاری تصویر (فرمت یا داده نامعتبر)'));
+        fr.onload = () => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error('عدم توانایی در بارگذاری تصویر (فرمت یا داده نامعتبر)'));
+          img.src = fr.result;
         };
-        img.src = URL.createObjectURL(file);
+        fr.readAsDataURL(file);
       });
     }
 
@@ -429,6 +454,8 @@
           }
         });
 
+        if (!blob || !blob.size) throw new Error('خروجی تصویر خالی است.');
+
         outputBlob = blob;
         if (outputURL) URL.revokeObjectURL(outputURL);
         outputURL = URL.createObjectURL(blob);
@@ -443,48 +470,76 @@
 
         setBar(100);
         saveBtn.disabled = false; shareBtn.disabled = false;
-        EA?.MainButton?.show?.();
       } catch (err) {
         showNote('خطا در تبدیل تصویر: ' + err.message, 'err');
         setBar(0);
       }
     }
 
-    // ذخیره — رفع مشکل کلیک: همیشه از Blob و anchor استفاده می‌کنیم
-    saveBtn.addEventListener('click', () => {
-      if (!outputBlob) { showNote('ابتدا تصویر را تبدیل کنید.', 'warn'); return; }
-      const a = document.createElement('a');
-      a.href = outputURL;
-      a.download = outputName || (outFormat.value==='png'?'image.png':'image.webp');
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    });
+    // آپلود Blob به HTTPS برای دانلود و اشتراک‌گذاری
+    // این تابع باید روی سرور خودت پیاده‌سازی شود (endpoint نمونه: /upload-image)
+    async function uploadBlobToHttps(blob, filename, mime){
+      // سرور باید برگرداند: { url: "https://your-cdn/..." }
+      const form = new FormData();
+      form.append('file', blob, filename);
+      form.append('mime', mime);
+      const res = await fetch('/upload-image', { method:'POST', body:form });
+      if (!res.ok) throw new Error('آپلود به سرور ناموفق بود.');
+      const data = await res.json();
+      if (!data || typeof data.url !== 'string' || !/^https:\/\//.test(data.url)) {
+        throw new Error('آدرس HTTPS معتبر از سرور دریافت نشد.');
+      }
+      return data.url;
+    }
 
-    // اشتراک‌گذاری — پوشش همه حالت‌ها + fallback بازکردن در مرورگر
-    shareBtn.addEventListener('click', async () => {
+    // دانلود با SDK ایتا (نیاز به HTTPS)
+    saveBtn.addEventListener('click', async () => {
       if (!outputBlob) { showNote('ابتدا تصویر را تبدیل کنید.', 'warn'); return; }
       try {
-        const file = new File([outputBlob], outputName || (outFormat.value==='png'?'image.png':'image.webp'), { type: outFormat.value==='png'?'image/png':'image/webp' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ title:'فایل خروجی', files:[file] });
-        } else if (navigator.share) {
-          await navigator.share({ title:'فایل خروجی', text:'فایل آماده اشتراک است.' });
-          showNote('برای اشتراک مستقیم فایل، مرورگری با Web Share سطح فایل نیاز است.', 'warn');
-        } else if (EA?.openLink) {
-          EA.openLink(outputURL, { try_browser: true });
-          showNote('فایل از طریق مرورگر باز شد.', 'ok');
+        // اگر قبلاً آپلود شده، استفاده کن؛ در غیر این صورت آپلود کن
+        if (!outputHttps) {
+          const mime = (outFormat.value === 'png') ? 'image/png' : 'image/webp';
+          outputHttps = await uploadBlobToHttps(outputBlob, outputName || (outFormat.value==='png'?'image.png':'image.webp'), mime);
+        }
+
+        if (EA && EA.isVersionAtLeast?.('1.4')) {
+          EA.MainButton?.showProgress?.(true);
+          EA.downloadFile({ url: outputHttps, file_name: outputName || 'download' });
+          EA.MainButton?.hideProgress?.();
+          EA.HapticFeedback?.notificationOccurred?.('success');
+          showNote('درخواست دانلود ارسال شد.', 'ok');
         } else {
-          showNote('این دستگاه از پنل اشتراک‌گذاری پشتیبانی نمی‌کند.', 'warn');
+          // fallback: بازکردن لینک در مرورگر (برنامک نمی‌بندد)
+          EA?.openLink?.(outputHttps, { try_browser:true });
+          showNote('لینک دانلود در مرورگر باز شد.', 'ok');
         }
       } catch (err) {
-        if (err && err.name === 'AbortError') return;
-        showNote('اشتراک‌گذاری ناموفق بود.', 'err');
+        EA?.HapticFeedback?.notificationOccurred?.('error');
+        showNote('خطا در دانلود: ' + err.message, 'err');
       }
     });
 
-    // آماده‌سازی محیط ایتا و رویدادها
-    document.addEventListener('DOMContentLoaded', applyEitaaEnvironment);
+    // اشتراک‌گذاری با باز کردن لینک در ایتا/مرورگر
+    shareBtn.addEventListener('click', async () => {
+      if (!outputBlob) { showNote('ابتدا تصویر را تبدیل کنید.', 'warn'); return; }
+      try {
+        if (!outputHttps) {
+          const mime = (outFormat.value === 'png') ? 'image/png' : 'image/webp';
+          outputHttps = await uploadBlobToHttps(outputBlob, outputName || (outFormat.value==='png'?'image.png':'image.webp'), mime);
+        }
+
+        // اگر لینک داخلی ایتاست، از openEitaaLink استفاده کن؛ اینجا فرض بیرونی است:
+        EA?.openLink?.(outputHttps, { try_instant_view:true, try_browser:true });
+        EA?.HapticFeedback?.selectionChanged?.();
+        showNote('لینک اشتراک‌گذاری باز شد.', 'ok');
+      } catch (err) {
+        EA?.HapticFeedback?.notificationOccurred?.('error');
+        showNote('خطا در اشتراک‌گذاری: ' + err.message, 'err');
+      }
+    });
+
+    // آماده‌سازی
+    window.addEventListener('DOMContentLoaded', applyEitaaEnvironment);
   </script>
 </body>
 </html>
