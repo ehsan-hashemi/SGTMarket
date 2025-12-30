@@ -37,7 +37,7 @@
     .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
     .brand img{width:34px;height:34px;border-radius:12px;box-shadow:0 0 0 2px rgba(255,255,255,0.18)}
     .brand .title{font-weight:900;letter-spacing:-0.2px}
-    .brand .subtitle{font-size:0.9rem;color:rgba(255,255,255,0.85); text-align:center;}
+    .brand .subtitle{font-size:0.9rem;color:rgba(255,255,255,0.85)}
 
     .container{max-width:960px;margin:12px auto;padding:0 12px}
     .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
@@ -101,6 +101,7 @@
 
   <header class="appbar">
     <a class="brand" href="#">
+      <img src="/icon.png" alt="SGT Market" />
       <div>
         <div class="title">SGT Market</div>
         <div class="subtitle">مبدل استیکر</div>
@@ -212,6 +213,13 @@
     let outputName = null;
     let imgWidth = 0, imgHeight = 0;
 
+    /* تنظیم مسیر HTTPS نهایی برای دانلود داخل ایتا
+       - اگر فایل را روی GitHub Pages/هاست خودت می‌گذاری، آدرس فایل را همینجا ست کن
+       - نمونه: https://sgtmarket.ir/Tools/image2webp/exports/<filename>
+       - می‌توانی پس از تبدیل، مقدار window.outputHttpsOverride را از بیرون اسکریپت ست کنی
+    */
+    const BASE_HTTPS = 'https://sgtmarket.ir/Tools/image2webp/exports/';
+
     /* ابزار */
     const fmtBytes = (b) => {
       if (!b && b !== 0) return '—';
@@ -258,7 +266,6 @@
         EA.MainButton?.setParams?.({ text:'دانلود', is_active:false, is_visible:true });
         EA.SecondaryButton?.setParams?.({ text:'اشتراک‌گذاری', is_active:false, is_visible:true, position:'right' });
 
-        // کلیک‌ها باید روی تعامل کاربر باشند
         EA.onEvent?.('mainButtonClicked', () => handleDownload());
         EA.onEvent?.('secondaryButtonClicked', () => handleShare());
 
@@ -453,6 +460,13 @@
         // فعال‌سازی دکمه‌های برنامک پس از آماده شدن خروجی
         EA?.MainButton?.setParams?.({ is_active:true });
         EA?.SecondaryButton?.setParams?.({ is_active:true });
+
+        // اگر خودت لینک HTTPS نهایی را می‌سازی/منتشر می‌کنی (GitHub Pages یا هاست)، اینجا تنظیمش کن:
+        // مثال: خروجی را با همان نام در مسیر exports پابلیش می‌کنی:
+        outputHttps = (window.outputHttpsOverride)
+          ? window.outputHttpsOverride
+          : (BASE_HTTPS + encodeURIComponent(outputName));
+        // توجه: فایل باید واقعاً در این مسیر منتشر شده باشد تا دانلود کار کند.
       } catch (err) {
         showNote('خطا در تبدیل تصویر: ' + err.message, 'err');
         setBar(0);
@@ -462,23 +476,22 @@
     // دانلود با SDK ایتا: نیاز به URL HTTPS واقعی
     async function handleDownload(){
       try {
-        if (!outputBlob) { EA?.showAlert?.('ابتدا تصویر را تبدیل کنید.'); return; }
         if (!EA?.isVersionAtLeast?.('1.4')) { EA?.showAlert?.('دانلود فایل در نسخه فعلی ایتا پشتیبانی نمی‌شود.'); return; }
+        if (!outputBlob) { EA?.showAlert?.('ابتدا تصویر را تبدیل کنید.'); return; }
 
-        // اگر قبلاً لینک HTTPS آماده شده است استفاده کن؛
-        // در غیر این صورت باید لینک HTTPS واقعی به متغیر زیر بدهی (مثلاً از سرور خودت):
-        // window.outputHttpsOverride = 'https://your-cdn.com/path/to/file.png';
-        outputHttps = window.outputHttpsOverride || outputHttps;
+        // اگر فایل را در GitHub Pages یا هاست خودت منتشر کرده‌ای:
+        // - یا window.outputHttpsOverride را بیرون ست کن
+        // - یا مطمئن شو outputHttps که بالا ساخته شده وجود دارد
+        const url = outputHttps;
+        const file_name = outputName || (outFormat.value==='png' ? 'image.png' : 'image.webp');
 
-        if (!outputHttps || !/^https:\/\//.test(outputHttps)) {
-          EA?.showAlert?.('برای دانلود با برنامک، آدرس فایل باید HTTPS باشد. لطفاً URL معتبر تنظیم شود.');
+        if (!url || !/^https:\/\//.test(url)) {
+          EA?.showAlert?.('برای دانلود با برنامک، آدرس فایل باید HTTPS باشد. لطفاً URL معتبر تنظیم کنید.');
           return;
         }
 
-        const file_name = outputName || (outFormat.value==='png' ? 'image.png' : 'image.webp');
-
         EA.MainButton?.showProgress?.(true);
-        EA.downloadFile({ url: outputHttps, file_name });
+        EA.downloadFile({ url, file_name });
         EA.MainButton?.hideProgress?.();
         EA.HapticFeedback?.notificationOccurred?.('success');
       } catch (err) {
@@ -488,10 +501,9 @@
       }
     }
 
-    // اشتراک‌گذاری (بدون تغییر طبق درخواست تو)
+    // اشتراک‌گذاری (بدون تغییر طبق درخواست)
     function handleShare(){
       try {
-        // اگر لینک اشتراک‌گذاری آماده داری، استفاده کن؛ در غیر این صورت، لینک HTTPS خروجی
         const shareUrl = window.shareUrlOverride || outputHttps;
         if (!shareUrl) { EA?.showAlert?.('ابتدا لینک اشتراک‌گذاری را آماده کنید.'); return; }
         EA.openLink(shareUrl, { try_instant_view:true, try_browser:true });
