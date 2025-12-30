@@ -37,7 +37,7 @@
     .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
     .brand img{width:34px;height:34px;border-radius:12px;box-shadow:0 0 0 2px rgba(255,255,255,0.18)}
     .brand .title{font-weight:900;letter-spacing:-0.2px}
-    .brand .subtitle{font-size:0.9rem;color:rgba(255,255,255,0.85)}
+    .brand .subtitle{font-size:0.9rem;color:rgba(255,255,255,0.85); text-align:center;}
 
     .container{max-width:960px;margin:12px auto;padding:0 12px}
     .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
@@ -69,15 +69,6 @@
     .img-wrap img{max-width:100%;max-height:100%;object-fit:contain}
     .placeholder{position:absolute;color:#9aa3af;text-align:center}
 
-    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .btn{
-      appearance:none;border:1px solid transparent;border-radius:12px;padding:12px 16px;min-height:48px;font-weight:800;cursor:pointer;
-      transition:transform .12s ease,box-shadow .12s ease;box-shadow:var(--shadow)
-    }
-    .btn.secondary{background:#fff;border:1px solid var(--border);color:#0f172a}
-    .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0) scale(0.99)}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-
     .meta{display:grid;gap:6px;grid-template-columns:repeat(2,1fr)}
     @media(min-width:480px){.meta{grid-template-columns:repeat(4,1fr)}}
     .chip{background:rgba(239,35,60,0.08);border:1px solid rgba(239,35,60,0.35);color:#7f1d1d;border-radius:999px;padding:6px 10px;font-size:0.88rem;text-align:center}
@@ -103,14 +94,13 @@
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
     :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:10px}
 
-    footer{margin-top:10px;color:var(--muted);font-size:0.9rem;text-align:center;padding-bottom:calc(10px + var(--safe-bottom))}
+    footer{margin-top:10px;color:#6b7280;font-size:0.9rem;text-align:center;padding-bottom:calc(10px + var(--safe-bottom))}
   </style>
 </head>
 <body>
 
   <header class="appbar">
     <a class="brand" href="#">
-      <img src="/icon.png" alt="SGT Market" />
       <div>
         <div class="title">SGT Market</div>
         <div class="subtitle">مبدل استیکر</div>
@@ -185,13 +175,6 @@
             <div class="chip">ابعاد: <span id="dims">—</span></div>
             <div class="chip">صرفه‌جویی: <span id="saved">—</span></div>
           </div>
-
-          <div class="row">
-            <div class="controls">
-              <button id="saveBtn" class="btn secondary" disabled>دانلود</button>
-              <button id="shareBtn" class="btn secondary" disabled>اشتراک‌گذاری</button>
-            </div>
-          </div>
         </aside>
       </div>
     </div>
@@ -212,9 +195,6 @@
     const saved = document.getElementById('saved');
     const bar = document.getElementById('bar');
 
-    const saveBtn = document.getElementById('saveBtn');
-    const shareBtn = document.getElementById('shareBtn');
-
     const note = document.getElementById('note');
     const quality = document.getElementById('quality');
     const qVal = document.getElementById('qVal');
@@ -227,8 +207,8 @@
     /* وضعیت */
     let originalFile = null;
     let outputBlob = null;
-    let outputURL = null;     // blob: preview
-    let outputHttps = null;   // https: برای دانلود/اشتراک
+    let outputURL = null;     // blob: برای preview
+    let outputHttps = null;   // https: برای دانلود با SDK
     let outputName = null;
     let imgWidth = 0, imgHeight = 0;
 
@@ -274,12 +254,13 @@
           document.documentElement.style.setProperty('--vh', vh2 + 'px');
         });
 
-        // دکمه‌های پایین برنامک برای تعامل کاربر
-        EA.MainButton?.setParams?.({ text:'دانلود', is_active:true, is_visible:true });
-        EA.SecondaryButton?.setParams?.({ text:'اشتراک‌گذاری', is_active:true, is_visible:true, position:'right' });
+        // دکمه‌های برنامک
+        EA.MainButton?.setParams?.({ text:'دانلود', is_active:false, is_visible:true });
+        EA.SecondaryButton?.setParams?.({ text:'اشتراک‌گذاری', is_active:false, is_visible:true, position:'right' });
 
-        EA.onEvent?.('mainButtonClicked', () => saveBtn.click());
-        EA.onEvent?.('secondaryButtonClicked', () => shareBtn.click());
+        // کلیک‌ها باید روی تعامل کاربر باشند
+        EA.onEvent?.('mainButtonClicked', () => handleDownload());
+        EA.onEvent?.('secondaryButtonClicked', () => handleShare());
 
         EA.BackButton?.show?.();
         EA.onEvent?.('backButtonClicked', () => EA.close?.());
@@ -292,8 +273,9 @@
       outputURL = null; outputBlob = null; outputHttps = null; outputName = null;
       preview.removeAttribute('src'); placeholder.style.display = 'block';
       inSize.textContent = '۰'; outSize.textContent = '۰'; dims.textContent = '—'; saved.textContent = '—';
-      saveBtn.disabled = true; shareBtn.disabled = true;
       setBar(0); hideNote();
+      EA?.MainButton?.setParams?.({ is_active:false });
+      EA?.SecondaryButton?.setParams?.({ is_active:false });
     }
     resetState();
 
@@ -325,7 +307,6 @@
 
     // بارگذار سازگار: createImageBitmap → Image(blob URL) → FileReader(data URL)
     async function loadImageFromFile(file){
-      // جلوگیری از فرمت‌های دشوار (HEIC/HEIF) که معمولاً پشتیبانی نمی‌شوند
       const name = (file.name || '').toLowerCase();
       if (/\.(heic|heif|raw|cr2|nef|arw)$/.test(name)) {
         throw new Error('این فرمت در مرورگر/وب‌ویو پشتیبانی نمی‌شود.');
@@ -437,7 +418,6 @@
 
         setBar(60);
 
-        // خروجی
         const type = outFormat.value === 'png' ? 'image/png' : 'image/webp';
         const supportsWebP = (() => {
           try { const c = document.createElement('canvas'); return c.toDataURL('image/webp').startsWith('data:image/webp'); }
@@ -469,76 +449,59 @@
         saved.textContent = gain + '٪';
 
         setBar(100);
-        saveBtn.disabled = false; shareBtn.disabled = false;
+
+        // فعال‌سازی دکمه‌های برنامک پس از آماده شدن خروجی
+        EA?.MainButton?.setParams?.({ is_active:true });
+        EA?.SecondaryButton?.setParams?.({ is_active:true });
       } catch (err) {
         showNote('خطا در تبدیل تصویر: ' + err.message, 'err');
         setBar(0);
       }
     }
 
-    // آپلود Blob به HTTPS برای دانلود و اشتراک‌گذاری
-    // این تابع باید روی سرور خودت پیاده‌سازی شود (endpoint نمونه: /upload-image)
-    async function uploadBlobToHttps(blob, filename, mime){
-      // سرور باید برگرداند: { url: "https://your-cdn/..." }
-      const form = new FormData();
-      form.append('file', blob, filename);
-      form.append('mime', mime);
-      const res = await fetch('/upload-image', { method:'POST', body:form });
-      if (!res.ok) throw new Error('آپلود به سرور ناموفق بود.');
-      const data = await res.json();
-      if (!data || typeof data.url !== 'string' || !/^https:\/\//.test(data.url)) {
-        throw new Error('آدرس HTTPS معتبر از سرور دریافت نشد.');
+    // دانلود با SDK ایتا: نیاز به URL HTTPS واقعی
+    async function handleDownload(){
+      try {
+        if (!outputBlob) { EA?.showAlert?.('ابتدا تصویر را تبدیل کنید.'); return; }
+        if (!EA?.isVersionAtLeast?.('1.4')) { EA?.showAlert?.('دانلود فایل در نسخه فعلی ایتا پشتیبانی نمی‌شود.'); return; }
+
+        // اگر قبلاً لینک HTTPS آماده شده است استفاده کن؛
+        // در غیر این صورت باید لینک HTTPS واقعی به متغیر زیر بدهی (مثلاً از سرور خودت):
+        // window.outputHttpsOverride = 'https://your-cdn.com/path/to/file.png';
+        outputHttps = window.outputHttpsOverride || outputHttps;
+
+        if (!outputHttps || !/^https:\/\//.test(outputHttps)) {
+          EA?.showAlert?.('برای دانلود با برنامک، آدرس فایل باید HTTPS باشد. لطفاً URL معتبر تنظیم شود.');
+          return;
+        }
+
+        const file_name = outputName || (outFormat.value==='png' ? 'image.png' : 'image.webp');
+
+        EA.MainButton?.showProgress?.(true);
+        EA.downloadFile({ url: outputHttps, file_name });
+        EA.MainButton?.hideProgress?.();
+        EA.HapticFeedback?.notificationOccurred?.('success');
+      } catch (err) {
+        EA?.MainButton?.hideProgress?.();
+        EA?.HapticFeedback?.notificationOccurred?.('error');
+        EA?.showAlert?.('خطا در دانلود: ' + (err?.message || 'نامشخص'));
       }
-      return data.url;
     }
 
-    // دانلود با SDK ایتا (نیاز به HTTPS)
-    saveBtn.addEventListener('click', async () => {
-      if (!outputBlob) { showNote('ابتدا تصویر را تبدیل کنید.', 'warn'); return; }
+    // اشتراک‌گذاری (بدون تغییر طبق درخواست تو)
+    function handleShare(){
       try {
-        // اگر قبلاً آپلود شده، استفاده کن؛ در غیر این صورت آپلود کن
-        if (!outputHttps) {
-          const mime = (outFormat.value === 'png') ? 'image/png' : 'image/webp';
-          outputHttps = await uploadBlobToHttps(outputBlob, outputName || (outFormat.value==='png'?'image.png':'image.webp'), mime);
-        }
-
-        if (EA && EA.isVersionAtLeast?.('1.4')) {
-          EA.MainButton?.showProgress?.(true);
-          EA.downloadFile({ url: outputHttps, file_name: outputName || 'download' });
-          EA.MainButton?.hideProgress?.();
-          EA.HapticFeedback?.notificationOccurred?.('success');
-          showNote('درخواست دانلود ارسال شد.', 'ok');
-        } else {
-          // fallback: بازکردن لینک در مرورگر (برنامک نمی‌بندد)
-          EA?.openLink?.(outputHttps, { try_browser:true });
-          showNote('لینک دانلود در مرورگر باز شد.', 'ok');
-        }
+        // اگر لینک اشتراک‌گذاری آماده داری، استفاده کن؛ در غیر این صورت، لینک HTTPS خروجی
+        const shareUrl = window.shareUrlOverride || outputHttps;
+        if (!shareUrl) { EA?.showAlert?.('ابتدا لینک اشتراک‌گذاری را آماده کنید.'); return; }
+        EA.openLink(shareUrl, { try_instant_view:true, try_browser:true });
+        EA.HapticFeedback?.selectionChanged?.();
       } catch (err) {
         EA?.HapticFeedback?.notificationOccurred?.('error');
-        showNote('خطا در دانلود: ' + err.message, 'err');
+        EA?.showAlert?.('خطا در اشتراک‌گذاری: ' + (err?.message || 'نامشخص'));
       }
-    });
+    }
 
-    // اشتراک‌گذاری با باز کردن لینک در ایتا/مرورگر
-    shareBtn.addEventListener('click', async () => {
-      if (!outputBlob) { showNote('ابتدا تصویر را تبدیل کنید.', 'warn'); return; }
-      try {
-        if (!outputHttps) {
-          const mime = (outFormat.value === 'png') ? 'image/png' : 'image/webp';
-          outputHttps = await uploadBlobToHttps(outputBlob, outputName || (outFormat.value==='png'?'image.png':'image.webp'), mime);
-        }
-
-        // اگر لینک داخلی ایتاست، از openEitaaLink استفاده کن؛ اینجا فرض بیرونی است:
-        EA?.openLink?.(outputHttps, { try_instant_view:true, try_browser:true });
-        EA?.HapticFeedback?.selectionChanged?.();
-        showNote('لینک اشتراک‌گذاری باز شد.', 'ok');
-      } catch (err) {
-        EA?.HapticFeedback?.notificationOccurred?.('error');
-        showNote('خطا در اشتراک‌گذاری: ' + err.message, 'err');
-      }
-    });
-
-    // آماده‌سازی
     window.addEventListener('DOMContentLoaded', applyEitaaEnvironment);
   </script>
 </body>
